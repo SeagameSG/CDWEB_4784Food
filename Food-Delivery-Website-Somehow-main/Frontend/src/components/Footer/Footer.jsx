@@ -28,7 +28,7 @@ const Footer = () => {
                     LIÊN HỆ</h2>
                 <ul>
                     <li>+91-98980 98980</li>
-                    <li>contact@nomnomgo.com</li>
+                    <li>contact@4784.com</li>
                 </ul>
             </div>
         </div>
