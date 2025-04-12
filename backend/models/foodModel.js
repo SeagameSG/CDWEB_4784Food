@@ -10,10 +10,8 @@ const foodSchema = new mongoose.Schema({
 
 
 
-// agar model h toh usse use krega or agar nahi h toh usse wapsh create krega.
 const foodModel = mongoose.models.food || mongoose.model("food", foodSchema);
 
 
 
-// exporting foodmodel
 export default foodModel;
