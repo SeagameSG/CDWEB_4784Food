@@ -8,7 +8,6 @@ import axios from 'axios'
 
 const LoginPopUp = ({setShowLogin}) => {
 
-   // fetch url usnin context api
    const {url, setToken} = useContext(StoreContext);
 
    const [currState, setCurrState] = useState("Login");
@@ -69,7 +68,7 @@ const LoginPopUp = ({setShowLogin}) => {
             <input name='email' onChange={onChangeHandler} value={data.email} type="email" placeholder='Nhập email của bạn' required />
             <input name='password' onChange={onChangeHandler} value={data.password} type="password" placeholder='Nhập mật khẩu của bạn' required />
          </div>
-         <button type='submit'>{currState==="Đăng ký"?"Tạo tài khoản":"Đăng nhập"}</button>
+         <button type='submit'>{currState==="Sign Up"?"Sign Up":"Login"}</button>
          <div className='login-popup-condition'>
             <input type="checkbox" required />
             <p>Bằng cách tiếp tục, tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.</p>

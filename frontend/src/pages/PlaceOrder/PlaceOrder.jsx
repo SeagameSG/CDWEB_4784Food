@@ -15,9 +15,9 @@ const PlaceOrder = () => {
     email: "",
     street: "",
     city: "",
-    state: "Gujarat",
+    state: "",
     zipcode: "",
-    country: "India",
+    country: "VietNam",
     phone: "",
   });
 
@@ -43,11 +43,10 @@ const PlaceOrder = () => {
       items:orderItems,
       amount:getTotalCartAmount()+15,
     }
-    let response = await axios.post(url+"/api/order/place",orderData,{headers:{token}});
+    let response = await axios.post(url+"/api/order/place-vnpay",orderData,{headers:{token}});
     // getting response
     if (response.data.success) {
-      const {session_url} = response.data;
-      window.location.replace(session_url);
+      window.location.replace(response.data.paymentUrl);
     }
     else
     {
