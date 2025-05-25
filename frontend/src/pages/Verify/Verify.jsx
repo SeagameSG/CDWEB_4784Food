@@ -17,7 +17,8 @@ const Verify = () => {
     const verifyPayment = async () => {
       const response = await axios.post(url+"/api/order/verify",{success,orderId});
       if (response.data.success) {
-          navigate("/myorders");
+          // Redirect to track order page with success parameter
+          navigate(`/trackorder?success=${success}&orderId=${orderId}`);
       }
       else {
         navigate("/")
