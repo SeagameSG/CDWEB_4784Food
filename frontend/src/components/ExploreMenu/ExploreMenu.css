@@ -54,7 +54,7 @@
 /* Menu List - Scrollable */
 .explore-menu-list {
     display: flex;
-    justify-content: flex-start; /* Ensures all items are visible */
+    justify-content: center;
     align-items: center;
     gap: 30px;
     text-align: center;
@@ -83,8 +83,12 @@
 
 /* Menu Item Image */
 .explore-menu-list-item img {
-    width: 7.5vw;
-    min-width: 80px;
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    object-fit: cover;
+    object-position: center;
     cursor: pointer;
     border-radius: 50%;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -142,28 +146,17 @@
     }
 }
 
+/* Responsive Styles cho mobile */
 @media (max-width: 750px) {
     .explore-menu h1 {
         font-size: 22px;
     }
 
     .explore-menu-list {
-        justify-content: flex-start;
+        justify-content: center;
         gap: 20px;
-        overflow-x: auto; /* Ensure horizontal scrolling */
+        overflow-x: auto;
         padding-bottom: 15px;
         scroll-snap-type: x mandatory;
-    }
-
-    .explore-menu-list-item {
-        flex: 0 0 auto; /* Ensures proper alignment */
-    }
-
-    .explore-menu-list-item img {
-        width: 60px;
-    }
-
-    .explore-menu-list-item p {
-        font-size: 14px;
     }
 }

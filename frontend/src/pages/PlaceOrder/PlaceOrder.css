@@ -97,3 +97,196 @@
         max-width: 100%;
     }
 }
+
+.payment-method-selection {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.payment-method-selection h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-option:hover {
+    border-color: #aaa;
+}
+
+.payment-option input[type="radio"] {
+    margin-right: 10px;
+    accent-color: #4fbb4f;
+}
+
+.payment-option label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.payment-info {
+    color: #666;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 12px;
+    font-style: italic;
+}
+
+.saved-addresses {
+  margin-bottom: 20px;
+}
+
+.saved-addresses h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.address-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.address-option {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.address-option:hover {
+  border-color: #2E8B57;
+}
+
+.address-option.selected {
+  border-color: #2E8B57;
+  background-color: rgba(46, 139, 87, 0.05);
+}
+
+.address-option-checkbox {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Improved radio button styling */
+.address-option-checkbox input[type="radio"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #2E8B57;
+}
+
+.address-option-details {
+  flex: 1;
+}
+
+.address-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.default-badge {
+  background-color: #2E8B57;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
+
+/* Styling for the "Use New Address" option */
+.use-new-address {
+  margin: 15px 0;
+}
+
+.new-address-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+}
+
+.new-address-label input[type="radio"] {
+  margin: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.plus-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  margin-right: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #2E8B57;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+}
+
+.new-address-label:hover .plus-icon {
+  background-color: #e0e0e0;
+}
+
+.new-address-label input[type="radio"]:checked + .plus-icon {
+  background-color: #2E8B57;
+  color: white;
+  border-color: #2E8B57;
+}
+
+.location-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coordinates-display {
+  background-color: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.get-location-btn {
+  background-color: #2E8B57;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.get-location-btn:hover {
+  background-color: #1d6a44;
+}

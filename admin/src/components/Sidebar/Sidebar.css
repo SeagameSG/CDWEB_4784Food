@@ -1,11 +1,14 @@
 /* Sidebar Container */
 .sidebar {
     width: 18%;
+    min-width: 220px;
     min-height: 100vh;
     background: linear-gradient(135deg, #2E8B57, #1d6a44);
     border-right: 2px solid #a9a9a9;
     font-size: max(1vw, 12px);
     transition: all 0.3s ease-in-out;
+    flex-shrink: 0;
+
 }
 
 /* Sidebar Options Container */

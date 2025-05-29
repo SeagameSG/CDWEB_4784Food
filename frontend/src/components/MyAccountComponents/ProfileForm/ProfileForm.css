@@ -1,137 +1,296 @@
 .profile-form {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    /* box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); */
-    width: 100%;
-    /* max-width: 800px; */
-    margin-top: -20px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Profile Picture Upload */
+/* Tabs Navigation */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.profile-tabs button {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.profile-tabs button.active {
+  color: #2E8B57;
+}
+
+.profile-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #2E8B57;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+/* Profile content layout */
+.profile-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+}
+
+.profile-left {
+  flex: 0 0 120px;
+}
+
+.profile-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Image upload section */
 .add-image-upload {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .upload-label {
-    cursor: pointer;
-    display: inline-block;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid #2E8B57;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-}
-
-.upload-label img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid #2E8B57;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(46, 139, 87, 0.2);
 }
 
 .upload-label:hover {
-    transform: scale(1.1);
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(46, 139, 87, 0.3);
 }
 
-/* Form Fields */
-.form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.upload-label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* First & Last Name in Same Row */
-.input-row {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
+/* Form rows */
+.form-row {
+  display: flex;
+  gap: 15px;
+  width: 100%;
 }
 
-/* Gender & Button in Same Row */
 .input-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  flex: 1;
+  min-width: 0; /* Prevents flex items from overflowing */
 }
 
-/* Input Fields */
+/* Coordinate inputs */
+.coordinates-row .input-group {
+  position: relative;
+}
+
+.coordinates-row .input-group input {
+  padding-right: 30px; /* Space for the unit label */
+}
+
+/* Input fields */
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
 .input-group input,
 .input-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    transition: all 0.3s ease-in-out;
-    background: #f9f9f9;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
 }
 
-/* Email & Phone Fields (Adding Same Styling) */
-input[type="email"], 
-input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: .95rem;
-    transition: all 0.3s ease-in-out;
-    background: #f9f9f9;
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #2E8B57;
+  box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.1);
 }
 
-/* Focus Effect for All Inputs */
-input:focus,
-select:focus {
-    border-color: #2E8B57;
-    background: white;
-    box-shadow: 0px 0px 5px rgba(46, 139, 87, 0.2);
-    outline: none;
+.input-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 
-/* Labels */
-.input-group label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #444;
-}
-
-/* Update Button */
+/* Update button */
 .update-btn {
-    border: none;
-    background: #2E8B57;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    width: max(15vw, 200px);
-    text-align: center;
-    margin-top: 22px;
+  background: linear-gradient(135deg, #2E8B57, #1d6a44);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  align-self: flex-end;
 }
 
 .update-btn:hover {
-    background: #1d6e43;
-    transform: scale(1.05);
+  background: linear-gradient(135deg, #1d6a44, #0f4c31);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .input-row {
-        flex-direction: column;
-        gap: 10px;
-    }
+.update-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
 
-    .update-btn {
-        width: 100%;
-    }
+/* Password Reset Section */
+.password-reset-section {
+  padding: 10px;
+}
+
+.password-reset-section h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.password-reset-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Password Strength */
+.password-strength-container {
+  margin-top: 8px;
+}
+
+.password-strength-bar {
+  width: 100%;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.strength-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.level-1 {
+  color: red;
+}
+
+.level-2 {
+  color: orange;
+}
+
+.level-3, .level-4 {
+  color: green;
+}
+
+/* Error message */
+.error-message {
+  color: #e53935;
+  font-size: 14px;
+  margin: 5px 0;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .profile-form {
+    padding: 15px;
+  }
+  
+  .profile-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .profile-left {
+    flex: none;
+    margin-bottom: 20px;
+  }
+  
+  .profile-right {
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .update-btn {
+    width: 100%;
+    align-self: center;
+  }
+  
+  .profile-tabs button {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-label {
+    width: 100px;
+    height: 100px;
+  }
+
+  .input-group input,
+  .input-group select {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .update-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 }

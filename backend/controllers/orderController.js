@@ -31,6 +31,35 @@ function sortObject(obj) {
     return sorted;
 }
 
+// Create an order with Cash on Delivery payment method
+const createCodOrder = async (req, res) => {
+    try {
+        const newOrder = new orderModel({
+            userId: req.body.userId,
+            items: req.body.items,
+            amount: req.body.amount,
+            address: req.body.address,
+            coordinates: req.body.coordinates || {lat: 10.8685, lng: 106.7800},
+            payment: false,
+            paymentMethod: 'cod'
+        });
+        
+        await newOrder.save();
+        
+        // Clear cart after successful order creation
+        await userModel.findByIdAndUpdate(req.body.userId, {cartData: {}});
+        
+        res.json({
+            success: true,
+            message: "Order placed successfully",
+            orderId: newOrder._id
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message: "Failed to place order"});
+    }
+}
+
 const createVnpayPaymentUrl = async (req, res) => {
     try {
         // Get IP address
@@ -51,12 +80,14 @@ const createVnpayPaymentUrl = async (req, res) => {
             items: req.body.items,
             amount: req.body.amount,
             address: req.body.address,
-            payment: false
+            coordinates: req.body.coordinates || {lat: 10.8685, lng: 106.7800},
+            payment: false,
+            paymentMethod: 'vnpay'
         });
         await newOrder.save();
 
         // Store order data for later use in return handler
-        globalOrderData[newOrder.userId] = {
+        globalOrderData[newOrder._id] = {
             userId: req.body.userId,
             items: req.body.items
         };
@@ -76,8 +107,8 @@ const createVnpayPaymentUrl = async (req, res) => {
         vnpParams['vnp_TxnRef'] = orderId;
         vnpParams['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + orderId;
         vnpParams['vnp_OrderType'] = 'other';
-        vnpParams['vnp_Amount'] = Math.round(req.body.amount * 100); // Convert to VND
-        vnpParams['vnp_ReturnUrl'] = `${returnUrl}?orderId=${newOrder.userId}`;
+        vnpParams['vnp_Amount'] = req.body.amount
+        vnpParams['vnp_ReturnUrl'] = `${returnUrl}?orderId=${newOrder._id}`;
         vnpParams['vnp_IpAddr'] = ipAddr;
         vnpParams['vnp_CreateDate'] = createDate;
 
@@ -95,7 +126,7 @@ const createVnpayPaymentUrl = async (req, res) => {
         res.json({
             success: true,
             paymentUrl: paymentUrl,
-            orderId: newOrder.userId
+            orderId: newOrder._id
         });
 
     } catch (error) {
@@ -130,29 +161,23 @@ const vnpayReturn = async (req, res) => {
         const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
 
         if (secureHash === signed) {
-            // Successful payment
             const responseCode = vnpParams['vnp_ResponseCode'];
 
             if (responseCode === '00') {
-                // Payment successful
                 await orderModel.findByIdAndUpdate(orderId, { payment: true });
 
-                // Clear cart if we saved this information
                 if (globalOrderData[orderId] && globalOrderData[orderId].userId) {
                     await userModel.findByIdAndUpdate(globalOrderData[orderId].userId, {cartData: {}});
                     // Cleanup stored data
                     delete globalOrderData[orderId];
                 }
 
-                // Redirect to frontend with success
                 res.redirect(`${frontend_url}/verify?success=true&orderId=${orderId}`);
             } else {
-                // Payment failed
                 await orderModel.findByIdAndDelete(orderId);
                 res.redirect(`${frontend_url}/verify?success=false&orderId=${orderId}`);
             }
         } else {
-            // Invalid signature
             await orderModel.findByIdAndDelete(orderId);
             res.redirect(`${frontend_url}/verify?success=false&orderId=${orderId}&error=invalid_signature`);
         }
@@ -166,6 +191,11 @@ const vnpayReturn = async (req, res) => {
 const verifyOrder = async (req, res) => {
     const {orderId, success} = req.body;
     try {
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+            return res.json({success: false, message: "Order not found"});
+        }
+
         if (success === "true") {
             await orderModel.findByIdAndUpdate(orderId, {payment: true});
             res.json({success: true, message: "Payment Successfully"});
@@ -181,7 +211,7 @@ const verifyOrder = async (req, res) => {
 
 const userOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({userId: req.body.userId});
+        const orders = await orderModel.find({userId: req.body.userId}).sort({date: -1});
         res.json({success: true, data: orders});
     } catch (error) {
         console.log(error);
@@ -191,7 +221,7 @@ const userOrders = async (req, res) => {
 
 const listOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({});
+        const orders = await orderModel.find({}).sort({date: -1});
         res.json({success: true, data: orders});
     } catch (error) {
         console.log(error);
@@ -200,13 +230,70 @@ const listOrders = async (req, res) => {
 }
 
 const updateStatus = async (req, res) => {
-    try {
-        await orderModel.findByIdAndUpdate(req.body.orderId, {status: req.body.status});
-        res.json({success: true, message: "Status Updated Successfully"});
-    } catch (error) {
-        console.log(error);
-        res.json({success: false, message: "Internal Server Error"});
+  try {
+    const { orderId, status } = req.body;
+    
+    let order;
+    if (!req.order) {
+      order = await orderModel.findById(orderId);
+      if (!order) {
+        return res.json({ success: false, message: "Order not found" });
+      }
+    } else {
+      order = req.order;
     }
-}
+    
+    await orderModel.findByIdAndUpdate(orderId, { status });
+    res.json({ success: true, message: "Status Updated Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Internal Server Error" });
+  }
+};
 
-export {createVnpayPaymentUrl, vnpayReturn, verifyOrder, userOrders, listOrders, updateStatus}
+const updatePaymentStatus = async (req, res) => {
+  try {
+    const { orderId, paymentStatus } = req.body;
+    
+    let order;
+    if (!req.order) {
+      order = await orderModel.findById(orderId);
+      if (!order) {
+        return res.json({ success: false, message: "Order not found" });
+      }
+      
+      if (order.paymentMethod === 'vnpay' && order.payment) {
+        return res.json({ 
+          success: false, 
+          message: "Cannot change payment status for completed VNPAY payments" 
+        });
+      }
+    } else {
+      order = req.order;
+      
+      if (paymentStatus === true && !order.payment) {
+        return res.json({ 
+          success: false, 
+          message: "Users cannot mark their own orders as paid" 
+        });
+      }
+    }
+    
+    await orderModel.findByIdAndUpdate(orderId, { payment: paymentStatus });
+    res.json({ success: true, message: "Payment Status Updated Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export {
+    createVnpayPaymentUrl, 
+    createCodOrder,
+    vnpayReturn, 
+    verifyOrder, 
+    userOrders, 
+    listOrders, 
+    updateStatus,
+    updatePaymentStatus
+}

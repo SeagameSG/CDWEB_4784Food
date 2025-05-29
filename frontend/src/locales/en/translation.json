@@ -1,0 +1,271 @@
+{
+  "navbar": {
+    "home": "Home",
+    "menu": "Menu",
+    "mobileApp": "Mobile App",
+    "customers": "Customers",
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "signIn": "Sign In",
+    "myAccount": "My Account",
+    "orders": "Orders",
+    "logout": "Logout",
+    "language": "Tiếng Việt"
+  },
+  "header": {
+    "title": "4784 - From Daklak to Tra Vinh",
+    "subtitle": "Choosing dishes is your job, delivering them to you is how we make money.",
+    "viewMenu": "View Menu"
+  },
+  "howItWorks": {
+    "process": "Process",
+    "title": "How It Works",
+    "description": "Your food is our responsibility\nGuaranteed refund.",
+    "steps": {
+      "step1": {
+        "title": "Choose a dish",
+        "description": "Select the food you want."
+      },
+      "step2": {
+        "title": "Choose cooking method",
+        "description": "If you want something special."
+      },
+      "step3": {
+        "title": "Delivery",
+        "description": "The food will arrive in about 15 minutes."
+      }
+    }
+  },
+  "exploreMenu": {
+    "menuText": "Menu",
+    "title": "Explore",
+    "description": "Delicious well-rounded dishes"
+  },
+  "foodDisplay": {
+    "title": "Daily Delicious Dishes",
+    "loading": "Loading..."
+  },
+  "customerReview": {
+    "title": "Customer Reviews:"
+  },
+  "aboutUs": {
+    "title": "About Us",
+    "description": "Welcome to <span>4784.</span>, Thank you for your interest and visiting our website. We promise to bring you delicious and fresh food with fast delivery, order and receive it right at your doorstep.",
+    "additionalInfo": "Hope you have a delicious meal and a happy journey!",
+    "orderNow": "Order Now"
+  },
+  "appDownload": {
+    "description": "For a better experience. Download\n4784. App"
+  },
+  "footer": {
+    "description": "Those who want to enjoy excellent flavors must accept the challenge. Wisdom guides the perfect choice! We are committed to providing an excellent culinary experience, where quality and joy blend. Enjoy, don't hesitate!",
+    "company": "COMPANY",
+    "home": "Home",
+    "aboutUs": "About us",
+    "shipping": "Shipping",
+    "privacyPolicy": "Privacy Policy",
+    "contact": "CONTACT",
+    "copyright": "Copyright 2025 © 4784 - All rights reserved."
+  },
+  "cart": {
+    "items": "Items",
+    "title": "Title",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "remove": "Remove",
+    "cartTotals": "Cart Totals",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "for": "for",
+    "deliveryFee": "Delivery Fee",
+    "checkoutButton": "PROCEED TO CHECKOUT",
+    "promoCodeTitle": "If you have a promo code, enter it here",
+    "promoCodePlaceholder": "Promo code",
+    "applyButton": "Apply",
+    "applying": "Applying...",
+    "removeCoupon": "Remove",
+    "appliedCoupon": "Applied coupon",
+    "couponRemoved": "Coupon removed",
+    "success": {
+      "couponApplied": "Coupon applied successfully!"
+    },
+    "errors": {
+      "emptyCoupon": "Please enter a coupon code",
+      "invalidCoupon": "Invalid coupon code"
+    }
+  },
+  "order": {
+    "title": "My Orders",
+    "noOrders": "No orders found.",
+    "items": "Items:",
+    "trackOrder": "Track Order",
+    "paymentMethod": {
+      "vnpay": "VNPay",
+      "cod": "Cash on Delivery"
+    },
+    "paymentStatus": {
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    }
+  },
+  "trackOrder": {
+    "title": "Track Order",
+    "loading": "Loading...",
+    "paymentSuccess": "Payment successful!",
+    "items": "Items:",
+    "deliveryAddress": "Delivery Address",
+    "viewOnMap": "View on Map",
+    "hideMap": "Hide Map",
+    "noOrders": "You don't have any orders yet",
+    "status": "Status",
+    "processing": "Processing",
+    "storeName": "4784Food Store",
+    "storeDescription": "Original location of your order",
+    "estimatedDeliveryTime": "Estimated Delivery Time",
+    "defaultDeliveryTime": "45 minutes",
+    "hoursAndMinutes": "{{hours}} hours {{minutes}} minutes",
+    "hoursOnly": "{{hours}} hours",
+    "minutesOnly": "{{minutes}} minutes",
+    "paymentMethod": {
+      "vnpay": "VNPay",
+      "cod": "Cash on Delivery"
+    },
+    "paymentStatus": {
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    },
+    "paymentMethodLabel": "Payment Method",
+    "paymentStatusLabel": "Payment Status"
+  },
+  "placeOrder": {
+    "shippingInfo": "Shipping Information",
+    "savedAddresses": "Saved Addresses",
+    "defaultBadge": "Default",
+    "useNewAddress": "Use New Address",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email address",
+    "street": "Street",
+    "city": "City",
+    "state": "State",
+    "zipCode": "Zip Code",
+    "country": "Country",
+    "phone": "Phone",
+    "coordinates": "Coordinates:",
+    "getCurrentLocation": "Get Current Location",
+    "orderTotal": "Order Total:",
+    "price": "Price:",
+    "shipping": "Shipping:",
+    "orderNow": "Order Now",
+    "payOnDelivery": "Pay on Delivery",
+    "vnpay": "VNPay",
+    "paymentMethod": "Payment Method",
+    "paymentInfo": {
+      "vnpay": "Payment will be processed through VNPay",
+      "cod": "You will pay when the order is delivered"
+    },
+    "errors": {
+      "selectAddress": "Please select a shipping address",
+      "orderError": "An error occurred while placing your order",
+      "locationError": "Unable to get your location. Using default location.",
+      "browserNotSupported": "Your browser does not support geolocation"
+    },
+    "success": {
+      "orderPlaced": "Order placed successfully!"
+    }
+  },
+  "profilePage": {
+    "myAccount": "My Account",
+    "profileInformation": "Profile Information",
+    "myOrders": "My Orders",
+    "manageAddress": "Manage Address",
+    "passwordManager": "Password Manager",
+    "logout": "Logout"
+  },
+  "profileForm": {
+    "tabs": {
+      "profile": "Profile",
+      "password": "Change password"
+    },
+    "fullName": "FullName",
+    "email": "Email",
+    "phone": "Phone Number",
+    "gender": "Gender",
+    "selectGender": "Select Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "updateChanges": "Update Changes",
+    "updating": "Updating...",
+    "errors": {
+      "notLoggedIn": "You are not Logged In",
+      "fetchFailed": "Fetch Failed",
+      "updateFailed": "Update Profile Failed"
+    },
+    "success": {
+      "profileUpdated": "Update Completed"
+    }
+  },
+  "myAddress": {
+    "title": "Manage Address",
+    "addNewAddress": "Add New Address",
+    "loading": "Loading...",
+    "noAddress": "You don't have any addresses. Please add a new address.",
+    "default": "Default",
+    "makeDefault": "Set as Default",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editAddress": "Edit Address",
+    "addAddress": "Add New Address",
+    "fullName": "Full Name",
+    "phone": "Phone",
+    "street": "Street",
+    "city": "City",
+    "state": "State",
+    "zipCode": "Zip Code",
+    "country": "Country",
+    "coordinates": "Coordinates:",
+    "getCurrentLocation": "Get Current Location",
+    "gettingLocation": "Getting location...",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "currentPassword": "Current Password",
+    "verifyEmail": "Verify Email",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "resetButton": "Reset Password",
+    "passwordStrength": {
+      "weak": "Weak",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "errors": {
+      "passwordsDoNotMatch": "Passwords do not match!",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "resetFailed": "Password change failed",
+      "currentPasswordIncorrect": "Current Password Incorrect"
+    },
+    "success": "Password reset successfully!"
+  },
+  "loginPopup": {
+    "login": "Login",
+    "signUp": "Sign Up",
+    "enterName": "Enter your name",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "getCurrentLocation": "Get Current Location",
+    "gettingLocation": "Getting location...",
+    "coordinates": "Coordinates:",
+    "termsConditions": "By continuing, I agree to the terms of use and privacy policy.",
+    "createAccount": "Create a new account ? ",
+    "clickHere": "Click here",
+    "haveAccount": "Already have an account ? ",
+    "loginHere": "Login here"
+  }
+}

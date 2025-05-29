@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
-import { assets } from '../../assets/assets'
-
+import { assets } from '../../assets/assets';
+import { useTranslation } from 'react-i18next';
 
 const images = [
   assets.header_img2,
   assets.header_img4,
-  // assets.header_img7,
+  assets.header_img7,
   assets.header_img5,
-  // assets.header_img10,
   assets.header_img11,
   assets.header_img12
 ];
 
 const Header = () => {
   const [currentImage, setCurrentImage] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,12 +24,16 @@ const Header = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleViewMenu = () => {
+    document.querySelector('#explore-menu').scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="header" style={{ backgroundImage: `url(${images[currentImage]})` }}>
       <div className="header-contents">
-        <h2>4784 - Từ Daklak đến Trà Vinh</h2>
-        <p>Chọn món là việc của bạn, giao nó đến bạn là cách chúng tôi có tiền.</p>
-        <button>Xem Menu</button>
+        <h2>{t('header.title')}</h2>
+        <p>{t('header.subtitle')}</p>
+        <button onClick={handleViewMenu}>{t('header.viewMenu')}</button>
       </div>
     </div>
   );

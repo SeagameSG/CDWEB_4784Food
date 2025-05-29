@@ -4,28 +4,57 @@ import { assets } from '../../assets/assets';
 import { useContext } from 'react';
 import { StoreContext } from '../../context/StoreContext';
 import axios from 'axios'
-// import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPopUp = ({setShowLogin}) => {
-
+   const { t } = useTranslation();
    const {url, setToken} = useContext(StoreContext);
+   const navigate = useNavigate();
 
    const [currState, setCurrState] = useState("Login");
-   // to save name email and password
+
    const [data, setData] = useState({
       name:"",
       email:"",
-      password:""
+      password:"",
+      coordinates: {lat: 10.8685, lng: 106.7800}
    });
+   
+   const [gettingLocation, setGettingLocation] = useState(false);
 
-   // to take data from input to save variable
    const onChangeHandler = (event) => {
       const name = event.target.name;
       const value = event.target.value;
       setData(data => ({...data,[name]:value}))
    }
 
-   // for user login 
+   const getUserLocation = () => {
+      if (navigator.geolocation) {
+         setGettingLocation(true);
+         navigator.geolocation.getCurrentPosition(
+            (position) => {
+               setData(data => ({
+                  ...data, 
+                  coordinates: {
+                     lat: position.coords.latitude,
+                     lng: position.coords.longitude
+                  }
+               }));
+               setGettingLocation(false);
+            },
+            (error) => {
+               console.error("Error getting location:", error);
+               setGettingLocation(false);
+               alert("Không thể lấy vị trí của bạn. Sử dụng vị trí mặc định.");
+            }
+         );
+      } else {
+         alert("Trình duyệt của bạn không hỗ trợ geolocation");
+      }
+   };
+
+   // login
    const onLogin = async(event) => {
       event.preventDefault()
       let newUrl = url;
@@ -36,46 +65,69 @@ const LoginPopUp = ({setShowLogin}) => {
          newUrl += "/api/user/register"
       }
 
-      // api call
       const response = await axios.post(newUrl,data);
       if (response.data.success) {
-         setToken(response.data.token);
-         localStorage.setItem("token", response.data.token);
+        const handleLoginSuccess = (userData) => {
+          localStorage.setItem('token', userData.token);
+          setToken(userData.token);
+          
+          setShowLogin(false);
+          
+          const intendedPath = sessionStorage.getItem('intendedPath');
+          if (intendedPath) {
+            sessionStorage.removeItem('intendedPath');
+            navigate(intendedPath);
+          } else {
+            navigate('/');
+          }
+        };
+        handleLoginSuccess(response.data)
          setShowLogin(false)
       }
       else
       {
          alert(response.data.message)
       }
-
    }
-
-   
-
-   // useEffect(() => {
-   //    console.log(data);
-   // },[data])
      
   return (
     <div className='login-pop-up'>
       <form className='login-pop-up-container' onSubmit={onLogin}>
          <div className='login-pop-up-title'>
-            <h2>{currState}</h2>  
+            <h2>{currState === "Login" ? t('loginPopup.login') : t('loginPopup.signUp')}</h2>  
             <img onClick={() => setShowLogin(false) } src={assets.cross_icon} alt="" />
          </div>
          <div className='login-popup-inputs'>
-            {currState==="Login"?<></>:<input name='name' onChange={onChangeHandler} value={data.name} type="text" placeholder='Nhập tên của bạn' required />}
-            <input name='email' onChange={onChangeHandler} value={data.email} type="email" placeholder='Nhập email của bạn' required />
-            <input name='password' onChange={onChangeHandler} value={data.password} type="password" placeholder='Nhập mật khẩu của bạn' required />
+            {currState==="Login"?<></>:<>
+               <input name='name' onChange={onChangeHandler} value={data.name} type="text" placeholder={t('loginPopup.enterName')} required />
+               {/* Location button for registration only */}
+               <div className="location-input">
+                  <button 
+                     type="button" 
+                     className="get-location-btn" 
+                     onClick={getUserLocation}
+                     disabled={gettingLocation}
+                  >
+                     {gettingLocation ? t('loginPopup.gettingLocation') : t('loginPopup.getCurrentLocation')}
+                  </button>
+                  {data.coordinates && (
+                     <p className="coordinates-text">
+                        {t('loginPopup.coordinates')} {data.coordinates.lat.toFixed(4)}, {data.coordinates.lng.toFixed(4)}
+                     </p>
+                  )}
+               </div>
+            </>}
+            <input name='email' onChange={onChangeHandler} value={data.email} type="email" placeholder={t('loginPopup.enterEmail')} required />
+            <input name='password' onChange={onChangeHandler} value={data.password} type="password" placeholder={t('loginPopup.enterPassword')} required />
          </div>
-         <button type='submit'>{currState==="Sign Up"?"Sign Up":"Login"}</button>
+         <button type='submit'>{currState === "Sign Up" ? t('loginPopup.signUp') : t('loginPopup.login')}</button>
          <div className='login-popup-condition'>
             <input type="checkbox" required />
-            <p>Bằng cách tiếp tục, tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.</p>
+            <p>{t('loginPopup.termsConditions')}</p>
          </div>
-         {  currState==="Login"
-            ?<p>Tạo tài khoản mới?<span onClick={() => setCurrState("Sign Up")}>Bấm vào đây</span></p>
-            :<p>Đã có tài khoản<span onClick={() => setCurrState("Login")}>Đăng nhập tại đây</span></p>
+         {currState==="Login"
+            ?<p>{t('loginPopup.createAccount')}<span onClick={() => setCurrState("Sign Up")}>{t('loginPopup.clickHere')}</span></p>
+            :<p>{t('loginPopup.haveAccount')}<span onClick={() => setCurrState("Login")}>{t('loginPopup.loginHere')}</span></p>
          }
       </form>
     </div>

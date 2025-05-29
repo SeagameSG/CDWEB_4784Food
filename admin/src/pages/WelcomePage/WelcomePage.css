@@ -5,8 +5,8 @@
     justify-content: center;
     height: 100vh;
     text-align: center;
-    background: linear-gradient(135deg, #f0fff0, #e6f7e6); /* Light greenish background */
-    color: #333; /* Darker text for contrast */
+    background: linear-gradient(135deg, #f0fff0, #e6f7e6);
+    color: #333;
     font-family: "Poppins", sans-serif;
     padding: 20px;
 }
@@ -18,7 +18,7 @@ h1 {
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: #2E8B57; /* Deep green for better contrast */
+    color: #2E8B57;
 }
 
 /* Subtext */
@@ -43,15 +43,14 @@ h1 {
 /* Welcome Box */
 .welcome {
     width: 82%;
-    background: #fff; /* White background for better readability */
+    background: #fff;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for a professional touch */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     font-size: 16px;
     color: #444;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     h1 {
         font-size: 2.2rem;
@@ -71,7 +70,6 @@ h1 {
     }
 }
 
-/* Smooth Fade-in Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;

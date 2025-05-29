@@ -1,0 +1,271 @@
+{
+  "navbar": {
+    "home": "Trang chủ",
+    "menu": "Thực đơn",
+    "mobileApp": "Ứng dụng",
+    "customers": "Khách hàng",
+    "aboutUs": "Về chúng tôi",
+    "contactUs": "Liên hệ",
+    "signIn": "Đăng nhập",
+    "myAccount": "Tài khoản",
+    "orders": "Đơn hàng",
+    "logout": "Đăng xuất",
+    "language": "English"
+  },
+  "header": {
+    "title": "4784 - Từ Daklak đến Trà Vinh",
+    "subtitle": "Chọn món là việc của bạn, giao nó đến bạn là cách chúng tôi có tiền.",
+    "viewMenu": "Xem Menu"
+  },
+  "howItWorks": {
+    "process": "Quy trình",
+    "title": "Cách hoạt động",
+    "description": "Món ăn của bạn là trách nhiệm của chúng tôi\nĐảm bảo đổi trả hoàn tiền.",
+    "steps": {
+      "step1": {
+        "title": "Chọn món",
+        "description": "Chọn món ăn mà bạn muốn."
+      },
+      "step2": {
+        "title": "Chọn cách chế biến",
+        "description": "Nếu bạn muốn gì đó đặc biệt."
+      },
+      "step3": {
+        "title": "Giao hàng",
+        "description": "Món ăn sẽ đến với bạn trong khoảng 15 phút."
+      }
+    }
+  },
+  "exploreMenu": {
+    "menuText": "Menu",
+    "title": "Khám phá",
+    "description": "Những món ngon tròn vị"
+  },
+  "foodDisplay": {
+    "title": "Món ngon mỗi ngày",
+    "loading": "Đang tải..."
+  },
+  "customerReview": {
+    "title": "Đánh giá của khách hàng:"
+  },
+  "aboutUs": {
+    "title": "Về chúng tôi",
+    "description": "Chào mừng đến với <span>4784.</span>, Cảm ơn bạn đã quan tâm và ghé thăm website của chúng tôi. Chúng tôi hứa hẹn sẽ mang đến những món ăn ngon và tươi mới với tốc độ giao hàng nhanh chóng, hãy đặt hàng và nhận ngay trước cửa nhà bạn.",
+    "additionalInfo": "Hy vọng bạn có một buổi ăn ngon miệng và một hành trình hạnh phúc!",
+    "orderNow": "Đặt ngay"
+  },
+  "appDownload": {
+    "description": "Để có trải nghiệm tốt hơn. Tải xuống\n4784. App"
+  },
+  "footer": {
+    "description": "Những ai muốn tận hưởng hương vị tuyệt vời phải chấp nhận thử thách. Trí tuệ dẫn lối cho sự lựa chọn hoàn hảo! Chúng tôi cam kết mang đến trải nghiệm ẩm thực tuyệt vời, nơi chất lượng và niềm vui hòa quyện. Hãy thưởng thức, đừng ngần ngại!",
+    "company": "CÔNG TY",
+    "home": "Trang chủ",
+    "aboutUs": "Về chúng tôi",
+    "shipping": "Vận Chuyển",
+    "privacyPolicy": "Chính sách bảo mật",
+    "contact": "LIÊN HỆ",
+    "copyright": "Copyright 2025 © 4784 - Mọi quyền lợi được bảo lưu."
+  },
+  "cart": {
+    "items": "Sản phẩm",
+    "title": "Tên",
+    "price": "Giá",
+    "quantity": "Số lượng",
+    "total": "Tổng",
+    "remove": "Xóa",
+    "cartTotals": "Tổng giỏ hàng",
+    "subtotal": "Tạm tính",
+    "discount": "Giảm giá",
+    "for": "cho",
+    "deliveryFee": "Phí giao hàng",
+    "checkoutButton": "TIẾN HÀNH THANH TOÁN",
+    "promoCodeTitle": "Nếu bạn có mã giảm giá, hãy nhập tại đây",
+    "promoCodePlaceholder": "Mã giảm giá",
+    "applyButton": "Áp dụng",
+    "applying": "Đang áp dụng...",
+    "removeCoupon": "Xóa mã",
+    "appliedCoupon": "Mã giảm giá đã áp dụng",
+    "couponRemoved": "Đã xóa mã giảm giá",
+    "success": {
+      "couponApplied": "Áp dụng mã giảm giá thành công!"
+    },
+    "errors": {
+      "emptyCoupon": "Vui lòng nhập mã giảm giá",
+      "invalidCoupon": "Mã giảm giá không hợp lệ"
+    }
+  },
+  "order": {
+    "title": "Đơn hàng của tôi",
+    "noOrders": "Không tìm thấy đơn hàng nào.",
+    "items": "Sản phẩm:",
+    "trackOrder": "Theo dõi đơn hàng",
+    "paymentMethod": {
+      "vnpay": "VNPay",
+      "cod": "Thanh toán khi nhận hàng"
+    },
+    "paymentStatus": {
+      "paid": "Đã thanh toán",
+      "unpaid": "Chưa thanh toán"
+    }
+  },
+  "trackOrder": {
+    "title": "Theo dõi đơn hàng",
+    "loading": "Đang tải...",
+    "paymentSuccess": "Thanh toán thành công!",
+    "items": "Mặt hàng:",
+    "deliveryAddress": "Địa chỉ giao hàng",
+    "viewOnMap": "Xem trên bản đồ",
+    "hideMap": "Ẩn bản đồ",
+    "noOrders": "Bạn chưa có đơn hàng nào",
+    "status": "Trạng thái",
+    "processing": "Đang xử lý",
+    "storeName": "Cửa hàng 4784Food",
+    "storeDescription": "Địa điểm gốc của đơn hàng của bạn",
+    "estimatedDeliveryTime": "Thời gian giao hàng dự kiến",
+    "defaultDeliveryTime": "45 phút",
+    "hoursAndMinutes": "{{hours}} giờ {{minutes}} phút",
+    "hoursOnly": "{{hours}} giờ",
+    "minutesOnly": "{{minutes}} phút",
+    "paymentMethod": {
+      "vnpay": "VNPay",
+      "cod": "Thanh toán khi nhận hàng"
+    },
+    "paymentStatus": {
+      "paid": "Đã thanh toán",
+      "unpaid": "Chưa thanh toán"
+    },
+    "paymentMethodLabel": "Phương thức thanh toán",
+    "paymentStatusLabel": "Trạng thái thanh toán"
+  },
+  "placeOrder": {
+    "shippingInfo": "Thông tin giao hàng",
+    "savedAddresses": "Địa chỉ đã lưu",
+    "defaultBadge": "Mặc định",
+    "useNewAddress": "Sử dụng địa chỉ mới",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "email": "Địa chỉ email",
+    "street": "Đường phố",
+    "city": "Thành phố",
+    "state": "Tỉnh/Thành phố",
+    "zipCode": "Mã bưu điện",
+    "country": "Quốc gia",
+    "phone": "Điện thoại",
+    "coordinates": "Tọa độ:",
+    "getCurrentLocation": "Lấy vị trí hiện tại",
+    "orderTotal": "Tổng đơn hàng:",
+    "price": "Giá:",
+    "shipping": "Phí giao hàng:",
+    "orderNow": "Đặt hàng ngay",
+    "payOnDelivery": "Thanh toán khi nhận hàng",
+    "vnpay": "VNPay",
+    "paymentMethod": "Phương thức thanh toán",
+    "paymentInfo": {
+      "vnpay": "Thanh toán sẽ được xử lý thông qua VNPay",
+      "cod": "Bạn sẽ thanh toán khi đơn hàng được giao"
+    },
+    "errors": {
+      "selectAddress": "Vui lòng chọn địa chỉ giao hàng",
+      "orderError": "Đã xảy ra lỗi khi đặt đơn hàng của bạn",
+      "locationError": "Không thể lấy vị trí của bạn. Sử dụng vị trí mặc định.",
+      "browserNotSupported": "Trình duyệt của bạn không hỗ trợ định vị"
+    },
+    "success": {
+      "orderPlaced": "Đặt hàng thành công!"
+    }
+  },
+  "profilePage": {
+    "myAccount": "Tài khoản của tôi",
+    "profileInformation": "Thông tin cá nhân",
+    "myOrders": "Đơn hàng của tôi",
+    "manageAddress": "Quản lý địa chỉ",
+    "passwordManager": "Quản lý mật khẩu",
+    "logout": "Đăng xuất"
+  },
+  "profileForm": {
+    "tabs": {
+      "profile": "Thông tin cá nhân",
+      "password": "Đổi mật khẩu"
+    },
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "gender": "Giới tính",
+    "selectGender": "Chọn giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "latitude": "Vĩ độ",
+    "longitude": "Kinh độ",
+    "updateChanges": "Cập nhật",
+    "updating": "Đang cập nhật...",
+    "errors": {
+      "notLoggedIn": "Bạn chưa đăng nhập",
+      "fetchFailed": "Không thể tải thông tin người dùng",
+      "updateFailed": "Cập nhật thông tin thất bại"
+    },
+    "success": {
+      "profileUpdated": "Đã cập nhật thông tin thành công"
+    }
+  },
+  "myAddress": {
+    "title": "Quản lý địa chỉ",
+    "addNewAddress": "Thêm địa chỉ mới",
+    "loading": "Đang tải...",
+    "noAddress": "Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ mới.",
+    "default": "Mặc định",
+    "makeDefault": "Đặt làm mặc định",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "editAddress": "Chỉnh sửa địa chỉ",
+    "addAddress": "Thêm địa chỉ mới",
+    "fullName": "Họ tên",
+    "phone": "Số điện thoại",
+    "street": "Số nhà, đường",
+    "city": "Thành phố",
+    "state": "Tỉnh/Thành",
+    "zipCode": "Mã bưu điện",
+    "country": "Quốc gia",
+    "coordinates": "Tọa độ:",
+    "getCurrentLocation": "Lấy vị trí hiện tại",
+    "gettingLocation": "Đang lấy vị trí...",
+    "save": "Lưu",
+    "cancel": "Hủy"
+  },
+  "resetPassword": {
+    "title": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "resetButton": "Đổi mật khẩu",
+    "processing": "Đang xử lý...",
+    "success": "Đổi mật khẩu thành công",
+    "passwordStrength": {
+      "weak": "YẾU",
+      "good": "TRUNG BÌNH",
+      "strong": "MẠNH"
+    },
+    "errors": {
+      "passwordsDoNotMatch": "Mật khẩu không khớp",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+      "resetFailed": "Đổi mật khẩu thất bại",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng"
+    }
+  },
+  "loginPopup": {
+    "login": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "enterName": "Nhập tên của bạn",
+    "enterEmail": "Nhập email của bạn",
+    "enterPassword": "Nhập mật khẩu của bạn",
+    "getCurrentLocation": "Lấy vị trí hiện tại",
+    "gettingLocation": "Đang lấy vị trí...",
+    "coordinates": "Tọa độ:",
+    "termsConditions": "Bằng cách tiếp tục, tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.",
+    "createAccount": "Tạo tài khoản mới ? ",
+    "clickHere": "Bấm vào đây",
+    "haveAccount": "Đã có tài khoản ? ",
+    "loginHere": "Đăng nhập tại đây"
+  }
+}

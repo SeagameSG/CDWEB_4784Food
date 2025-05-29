@@ -122,6 +122,21 @@
     width: 20px;
 }
 
+.language-switcher {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-right: 15px;
+  transition: background-color 0.3s;
+}
+
+.language-switcher:hover {
+  background-color: #e04040;
+}
 
 
 @media (max-width:900px) {
@@ -153,4 +168,3 @@
         display: none;
     }
 }
-

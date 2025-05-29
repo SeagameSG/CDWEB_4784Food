@@ -15,12 +15,12 @@ const Home = () => {
 
   return (
     <div>
-      <Header/>
-      <HowItWorks/>
-      <ExploreMenu category={category} setCategory={setCategory}/>
-      <FoodDisplay category={category}/>
-      <CustomerReview/>
-      <AboutUs/>
+        <Header/>
+        <ExploreMenu category={category} setCategory={setCategory}/>
+        <FoodDisplay category={category}/>
+        <HowItWorks/>
+        <CustomerReview/>
+        <AboutUs/>
     </div>
   )
 }

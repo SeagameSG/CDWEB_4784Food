@@ -5,16 +5,13 @@ const orderSchema = new mongoose.Schema({
     items:{type: Array, required:true},
     amount:{type: Number, required:true},
     address:{type: Object, required:true},
+    coordinates:{type: Object, required:true}, // Added coordinates field
     status:{type: String, default:"Food Processing"},
     date:{type: Date, default:Date.now()},
-    payment:{type: Boolean, default:false}
+    payment:{type: Boolean, default:false},
+    paymentMethod:{type: String, default:"vnpay"} // Added payment method field
 })
-
-
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
-
-
-// exporting foodmodel
 export default orderModel;
