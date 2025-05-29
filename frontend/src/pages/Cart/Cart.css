@@ -83,6 +83,12 @@
     margin: 10px 0px;
 }
 
+/* Coupon Discount */
+.coupon-discount {
+    color: #2E8B57;
+    font-weight: 500;
+}
+
 /* Checkout Button */
 .cart-total button {
     border: none;
@@ -100,6 +106,16 @@
 .cart-total button:hover {
     background: linear-gradient(135deg, #1b6a44, #12522e);
     transform: scale(1.05);
+}
+
+.cart-total button.disabled-btn {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.cart-total button.disabled-btn:hover {
+    transform: none;
+    background: #cccccc;
 }
 
 /* Promo Code Section */
@@ -131,6 +147,15 @@
     flex: 1;
 }
 
+.cart-promocode-input input:disabled {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    font-size: 14px;
+    cursor: not-allowed;
+}
+
 .cart-promocode-input button {
     width: max(10vw, 150px);
     padding: 12px 5px;
@@ -146,6 +171,31 @@
 .cart-promocode-input button:hover {
     background: #333;
     transform: scale(1.05);
+}
+
+.cart-promocode-input button.loading-btn {
+    background: #999;
+    cursor: wait;
+}
+
+.cart-promocode-input button.remove-coupon-btn {
+    background: #ff5c5c;
+}
+
+.cart-promocode-input button.remove-coupon-btn:hover {
+    background: #d60000;
+}
+
+/* Applied Coupon Info */
+.applied-coupon-info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #2E8B57;
+}
+
+.coupon-code {
+    font-weight: bold;
+    margin-left: 5px;
 }
 
 /* Responsive Styles */

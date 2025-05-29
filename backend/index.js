@@ -6,7 +6,8 @@ import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
-
+import addressRouter from './routes/addressRoute.js';
+import couponRoutes from './routes/couponRoute.js';
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +30,8 @@ app.use("/images", express.static('uploads'));
 app.use("/api/user", userRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
+app.use('/api/address', addressRouter);
+app.use('/api/coupon', couponRoutes);
 
 
 app.get("/", (req, res) => {

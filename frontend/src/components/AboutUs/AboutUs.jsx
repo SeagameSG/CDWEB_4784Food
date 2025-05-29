@@ -1,9 +1,16 @@
 import React from "react";
 import { motion } from "framer-motion";
-import "./AboutUs.css"; // Import CSS file
+import "./AboutUs.css";
 import { assets } from "../../assets/assets";
+import { useTranslation } from 'react-i18next';
 
 const AboutUs = () => {
+  const { t } = useTranslation();
+  
+  const handleOrderNow = () => {
+    document.querySelector('#explore-menu').scrollIntoView({ behavior: 'smooth' });
+  };
+  
   return (
     <div className="about-container" id="about-us">
       <div className="about-content">
@@ -29,16 +36,12 @@ const AboutUs = () => {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2>About Us</h2>
+          <h2>{t('aboutUs.title')}</h2>
+          <p dangerouslySetInnerHTML={{ __html: t('aboutUs.description') }} />
           <p>
-            Welcome to <span>4784.</span>, Cảm ơn bạn đã quan tâm và ghé thăm website của chúng tôi.
-            Chúng tôi hứa hẹn sẽ mang đến những món ăn ngon và tươi mới với tốc độ giao hàng nhanh chóng,
-            hãy đặt hàng và nhận ngay trước cửa nhà bạn.
+            {t('aboutUs.additionalInfo')}
           </p>
-          <p>
-          Hy vọng bạn có một buổi ăn ngon miệng và một hành trình hạnh phúc!
-          </p>
-          <button className="learn-more-btn">Đặt ngay</button>
+          <button className="learn-more-btn" onClick={handleOrderNow}>{t('aboutUs.orderNow')}</button>
         </motion.div>
 
       </div>

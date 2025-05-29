@@ -1,8 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import "./CustomerReview.css";
+import { useTranslation } from 'react-i18next';
 
 const CustomerReview = () => {
+  const { t } = useTranslation();
+  
   const reviews = [
     {
       id: 1,
@@ -29,7 +32,7 @@ const CustomerReview = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          Đánh giá của khách hàng:
+          {t('customerReview.title')}
         </motion.h2>
         
         <div className="reviews-container">

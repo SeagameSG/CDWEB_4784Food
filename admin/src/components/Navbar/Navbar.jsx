@@ -11,9 +11,8 @@ const Navbar = () => {
       {/* Brand Name and Admin Panel */}
       <div className='brand-container'>
         <Link to='/'>
-          <h2 className='brand-name'>NomNomGo.</h2>
+          <h2 className='brand-name'>4784 F.       </h2>
         </Link>
-        <span className='admin-text'>Admin Panel</span>
       </div>
 
       {/* Profile Section with Hover Menu */}

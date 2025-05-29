@@ -1,38 +1,38 @@
 import React from "react";
 import "./HowItWorks.css";
 import { assets } from "../../assets/assets";
+import { useTranslation } from 'react-i18next';
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
 
-  // Step data with images
+  // Step data with images - now using translations
   const steps = [
     {
       id: 1,
       image: assets.howitworks_img1,
-      title: "Chọn món",
-      description: "Chọn món ăn mà bạn muốn."
+      titleKey: 'howItWorks.steps.step1.title',
+      descriptionKey: 'howItWorks.steps.step1.description'
     },
     {
       id: 2,
       image: assets.howitworks_img2,
-      title: "Chọn cách chế biến",
-      description: "Nếu bạn muốn gì đó đặc biệt."
+      titleKey: 'howItWorks.steps.step2.title',
+      descriptionKey: 'howItWorks.steps.step2.description'
     },
     {
       id: 3,
       image: assets.howitworks_img3,
-      title: "Giao hàng",
-      description: "Món ăn sẽ đến với bạn trong khoảng 15 phút."
+      titleKey: 'howItWorks.steps.step3.title',
+      descriptionKey: 'howItWorks.steps.step3.description'
     }
   ];
 
   return (
     <div className="how-it-works-container">
-      <p className="works-title">Quy trình</p>
-      <h2 className="title">Cách hoạt động</h2>
-      <p className="description">
-        Món ăn của bạn là trách nhiệm của chúng tôi <br />Đảm bảo đổi trả hoàn tiền.
-      </p>
+      <p className="works-title">{t('howItWorks.process')}</p>
+      <h2 className="title">{t('howItWorks.title')}</h2>
+      <p className="description" dangerouslySetInnerHTML={{ __html: t('howItWorks.description') }} />
       <div className="steps-container">
         {steps.map((step) => (
           <div key={step.id} className="step-card">
@@ -40,14 +40,14 @@ const HowItWorks = () => {
             {Array.isArray(step.images) ? (
               <div className="step-images">
                 {step.images.map((image, index) => (
-                  <img key={index} src={image} alt={`${step.title} - ${index}`} className="step-image" />
+                  <img key={index} src={image} alt={`${t(step.titleKey)} - ${index}`} className="step-image" />
                 ))}
               </div>
             ) : (
-              <img src={step.image} alt={step.title} className="step-image" />
+              <img src={step.image} alt={t(step.titleKey)} className="step-image" />
             )}
-            <h3 className="step-title">{step.title}</h3>
-            <p className="step-description">{step.description}</p>
+            <h3 className="step-title">{t(step.titleKey)}</h3>
+            <p className="step-description">{t(step.descriptionKey)}</p>
           </div>
         ))}
       </div>

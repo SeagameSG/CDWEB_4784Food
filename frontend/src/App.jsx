@@ -11,32 +11,57 @@ import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
 import TrackOrder from './pages/TrackOrder/TrackOrder'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 
 const App = () => {
-
   const [showLogin, setShowLogin] = useState(false);
 
   return (
     <>
-    {showLogin?<LoginPopUp setShowLogin={setShowLogin}/>:<></>}
+      {showLogin ? <LoginPopUp setShowLogin={setShowLogin} /> : <></>}
       <div className='app'>
-      <Navbar setShowLogin = {setShowLogin} />
-      <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/cart" element={<Cart/>} />
-        <Route path="/order" element={<PlaceOrder/>} />
-        <Route path="/verify" element={<Verify/>} />
-        <Route path="/myorders" element={<MyOrders/>} />
-        <Route path="/trackorder" element={<TrackOrder/>} />
-        <Route path="/ProfilePage" element={<ProfilePage/>} />
-      </Routes>
-    </div>
-    <AppDownload/>
-    <Footer/>
+        <Navbar setShowLogin={setShowLogin} />
+        <Routes>
+          {/* Public Route */}
+          <Route path="/" element={<Home />} />
+          <Route path="/verify" element={<Verify />} />
+          
+          {/* Protected Routes */}
+          <Route path="/cart" element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/order" element={
+            <ProtectedRoute>
+              <PlaceOrder />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/myorders" element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/trackorder" element={
+            <ProtectedRoute>
+              <TrackOrder />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/ProfilePage" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </div>
+      <AppDownload />
+      <Footer />
     </>
   )
-
 }
-
 
 export default App
