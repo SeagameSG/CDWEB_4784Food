@@ -5,17 +5,17 @@ const MyAddress = () => {
   const [addresses, setAddresses] = useState([
     {
       id: 1,
-      name: "John Doe",
-      phone: "9876543210",
-      address: "123, Green Street, Mumbai",
+      name: "Johny Nguyen",
+      phone: "0987654321",
+      address: "123, Quang Trung, Quan 9, Ho Chi Minh",
       pincode: "400001",
       isDefault: true
     },
     {
       id: 2,
       name: "Jane Smith",
-      phone: "9865321470",
-      address: "45, Blue Lane, Bangalore",
+      phone: "0986532147",
+      address: "45, Xuan Thuy, Quan 2, Ho Chi Minh",
       pincode: "560001",
       isDefault: false
     }
@@ -35,6 +35,7 @@ const MyAddress = () => {
     setNewAddress({ ...newAddress, [e.target.name]: e.target.value });
   };
 
+  // Add new address
   const addAddress = () => {
     if (newAddress.name && newAddress.phone && newAddress.address && newAddress.pincode) {
       setAddresses([...addresses, { ...newAddress, id: addresses.length + 1, isDefault: false }]);
@@ -43,6 +44,7 @@ const MyAddress = () => {
     }
   };
 
+  // Remove an address
   const removeAddress = (id) => {
     setAddresses(addresses.filter((address) => address.id !== id));
   };
@@ -82,8 +84,8 @@ const MyAddress = () => {
             <textarea name="address" placeholder="Complete Address" value={newAddress.address} onChange={handleChange}></textarea>
             <input type="text" name="pincode" placeholder="Pincode" value={newAddress.pincode} onChange={handleChange} />
             <div className="address-actions">
-              <button className="save-btn" onClick={addAddress}>Save Address</button>
-              <button className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+              <button className="save-btn" onClick={addAddress}>Lưu địa chỉ</button>
+              <button className="cancel-btn" onClick={() => setShowForm(false)}>Hủy bỏ</button>
             </div>
           </div>
         </div>

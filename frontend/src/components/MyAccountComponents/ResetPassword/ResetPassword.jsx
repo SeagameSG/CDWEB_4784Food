@@ -14,7 +14,7 @@ const ResetPassword = () => {
       setStep(2);
       setError("");
     } else {
-      setError("Email not found! Please enter a valid email.");
+      setError("Không tìm thấy email! Vui lòng nhập email hợp lệ.");
     }
   };
 
@@ -42,7 +42,7 @@ const ResetPassword = () => {
 
   const handleResetPassword = () => {
     if (passwords.new !== passwords.confirm) {
-      setError("Passwords do not match!");
+      setError("Mật khẩu không khớp!");
       return;
     }
 
@@ -53,7 +53,7 @@ const ResetPassword = () => {
     setStep(1);
     setError("");
 
-    alert("Password reset successfully!");
+    alert("Đặt lại mật khẩu thành công!");
   };
 
   return (
@@ -66,7 +66,7 @@ const ResetPassword = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            placeholder="Nhập email của bạn"
           />
           {error && <p className="error-message">{error}</p>}
           <button onClick={handleEmailSubmit}>Verify Email</button>
@@ -78,7 +78,7 @@ const ResetPassword = () => {
             name="new"
             value={passwords.new}
             onChange={handlePasswordChange}
-            placeholder="New Password"
+            placeholder="Mật khẩu mới"
           />
 
           {/* Password Strength Bar */}
@@ -96,11 +96,11 @@ const ResetPassword = () => {
             name="confirm"
             value={passwords.confirm}
             onChange={handlePasswordChange}
-            placeholder="Confirm New Password"
+            placeholder="Xác nhận mật khẩu mới"
           />
 
           {error && <p className="error-message">{error}</p>}
-          <button onClick={handleResetPassword}>Reset Password</button>
+          <button onClick={handleResetPassword}>Đặt lại mật khẩu</button>
         </div>
       )}
     </div>

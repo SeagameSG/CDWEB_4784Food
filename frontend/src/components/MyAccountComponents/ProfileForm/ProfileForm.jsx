@@ -52,13 +52,13 @@ const ProfileForm = () => {
           <div className="input-group">
             <label>Gender</label>
             <select>
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="">Giới tính</option>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+              <option value="other">Khác</option>
             </select>
           </div>
-          <button className="update-btn">Update Changes</button>
+          <button className="update-btn">Cập nhật thay đổi</button>
         </div>
       </div>
     </div>

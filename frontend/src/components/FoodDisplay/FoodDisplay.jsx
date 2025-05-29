@@ -7,7 +7,7 @@ const FoodDisplay = ({category}) => {
 
     const {food_list} = useContext(StoreContext);
     if(!food_list) {
-        return <p>Đang tải...</p>;
+        return <p>Đang tải các mặt hàng thực phẩm...</p>;
     }
 
 
@@ -15,7 +15,7 @@ const FoodDisplay = ({category}) => {
   return (
     <div>
         <div className="food-display" id='food_display'>
-            <h2>Món ngon mỗi ngày</h2>
+            <h2>Top dishes near you</h2>
             <div className="food-display-list">
               {food_list.map((item,index) => {
                   if (category==="All" || category===item.category) {
