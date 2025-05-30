@@ -260,6 +260,7 @@ const MyAddress = () => {
               value={newAddress.name} 
               onChange={handleChange} 
               required 
+              minLength="2"
             />
             <input 
               type="text" 
@@ -268,6 +269,7 @@ const MyAddress = () => {
               value={newAddress.phone} 
               onChange={handleChange} 
               required 
+              pattern="[0-9]{10,11}"
             />
             <input 
               type="text" 
@@ -276,6 +278,7 @@ const MyAddress = () => {
               value={newAddress.street} 
               onChange={handleChange} 
               required 
+              minLength="3"
             />
             <div className="form-row">
               <input 
@@ -285,6 +288,7 @@ const MyAddress = () => {
                 value={newAddress.city} 
                 onChange={handleChange} 
                 required 
+                minLength="2"
               />
               <input 
                 type="text" 
@@ -293,6 +297,7 @@ const MyAddress = () => {
                 value={newAddress.state} 
                 onChange={handleChange} 
                 required 
+                minLength="2"
               />
             </div>
             <div className="form-row">
@@ -303,6 +308,7 @@ const MyAddress = () => {
                 value={newAddress.zipcode} 
                 onChange={handleChange} 
                 required 
+                pattern="[0-9]{5,6}"
               />
               <input 
                 type="text" 
@@ -311,6 +317,7 @@ const MyAddress = () => {
                 value={newAddress.country} 
                 onChange={handleChange} 
                 required 
+                minLength="2"
               />
             </div>
             

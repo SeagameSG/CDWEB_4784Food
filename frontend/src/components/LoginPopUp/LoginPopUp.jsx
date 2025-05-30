@@ -98,10 +98,36 @@ const LoginPopUp = ({setShowLogin}) => {
             <img onClick={() => setShowLogin(false) } src={assets.cross_icon} alt="" />
          </div>
          <div className='login-popup-inputs'>
+            <input 
+              name='email' 
+              onChange={onChangeHandler} 
+              value={data.email} 
+              type="email" 
+              placeholder={t('loginPopup.enterEmail')} 
+              required 
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+            />
+            <input 
+              name='password' 
+              onChange={onChangeHandler} 
+              value={data.password} 
+              type="password" 
+              placeholder={t('loginPopup.enterPassword')} 
+              required 
+              minLength="8" 
+            />
             {currState==="Login"?<></>:<>
-               <input name='name' onChange={onChangeHandler} value={data.name} type="text" placeholder={t('loginPopup.enterName')} required />
-               {/* Location button for registration only */}
-               <div className="location-input">
+              <input 
+                name='name' 
+                onChange={onChangeHandler} 
+                value={data.name} 
+                type="text" 
+                placeholder={t('loginPopup.enterName')} 
+                required 
+                minLength="2"
+              />
+              {/* Location button for registration only */}
+              <div className="location-input">
                   <button 
                      type="button" 
                      className="get-location-btn" 
@@ -117,8 +143,6 @@ const LoginPopUp = ({setShowLogin}) => {
                   )}
                </div>
             </>}
-            <input name='email' onChange={onChangeHandler} value={data.email} type="email" placeholder={t('loginPopup.enterEmail')} required />
-            <input name='password' onChange={onChangeHandler} value={data.password} type="password" placeholder={t('loginPopup.enterPassword')} required />
          </div>
          <button type='submit'>{currState === "Sign Up" ? t('loginPopup.signUp') : t('loginPopup.login')}</button>
          <div className='login-popup-condition'>

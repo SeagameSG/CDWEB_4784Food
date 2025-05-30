@@ -107,7 +107,7 @@ const createVnpayPaymentUrl = async (req, res) => {
         vnpParams['vnp_TxnRef'] = orderId;
         vnpParams['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + orderId;
         vnpParams['vnp_OrderType'] = 'other';
-        vnpParams['vnp_Amount'] = req.body.amount
+        vnpParams['vnp_Amount'] = req.body.amount * 100;
         vnpParams['vnp_ReturnUrl'] = `${returnUrl}?orderId=${newOrder._id}`;
         vnpParams['vnp_IpAddr'] = ipAddr;
         vnpParams['vnp_CreateDate'] = createDate;

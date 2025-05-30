@@ -12,7 +12,6 @@ const TrackOrder = ({ url }) => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
   const [selectedOrderId, setSelectedOrderId] = useState(orderId || null);
-  const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   
   const [deliveryTimes, setDeliveryTimes] = useState({});
@@ -162,7 +161,7 @@ const TrackOrder = ({ url }) => {
         iconSize: [30, 30]
       });
 
-      const storeMarker = window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
+      window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
         icon: storeIcon
       })
         .addTo(map)
@@ -179,7 +178,7 @@ const TrackOrder = ({ url }) => {
         iconSize: [30, 30]
       });
 
-      const deliveryMarker = window.L.marker([coordinates.lat, coordinates.lng], {
+      window.L.marker([coordinates.lat, coordinates.lng], {
         icon: deliveryIcon
       })
         .addTo(map)
@@ -194,7 +193,7 @@ const TrackOrder = ({ url }) => {
         `)
         .openPopup();
 
-      const polyline = window.L.polyline([
+      window.L.polyline([
         [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
         [coordinates.lat, coordinates.lng]
       ], {
@@ -212,7 +211,6 @@ const TrackOrder = ({ url }) => {
   };
 
   useEffect(() => {
-    let scriptsLoaded = false;
     let scriptLoadTimer = null;
 
     // Font Awesome map icons
@@ -239,7 +237,6 @@ const TrackOrder = ({ url }) => {
       }, 10000); // 10 second timeout
 
       leafletScript.onload = () => {
-        scriptsLoaded = true;
         clearTimeout(scriptLoadTimer);
 
         try {
@@ -267,8 +264,6 @@ const TrackOrder = ({ url }) => {
         }
       };
     } else {
-      scriptsLoaded = true;
-
       // Initialize map have data
       if (data.length > 0 && window.L) {
         const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
@@ -322,7 +317,7 @@ const TrackOrder = ({ url }) => {
       ) : (
         <div className="track-order-container">
           {/* Map container */}
-          <div id="map-container" ref={mapContainerRef} className="map-container"></div>
+          <div id="map-container" className="map-container"></div>
 
           {/* Orders list */}
           <div className="orders-list">
