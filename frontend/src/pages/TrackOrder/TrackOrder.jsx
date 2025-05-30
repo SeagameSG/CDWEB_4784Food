@@ -17,7 +17,6 @@ const TrackOrder = () => {
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
   const [selectedOrderId, setSelectedOrderId] = useState(orderId || null);
-  const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   
   const [deliveryTimes, setDeliveryTimes] = useState({});
@@ -41,7 +40,7 @@ const TrackOrder = () => {
     return distance;
   };
 
-
+  // Cập nhật hàm này để thực sự sử dụng và cập nhật deliveryTimes
   const calculateDeliveryTime = (orderCoordinates) => {
     if (!validateCoordinates(orderCoordinates)) {
       return {
@@ -81,38 +80,45 @@ const TrackOrder = () => {
     return true;
   };
 
-const fetchOrders = async () => {
-  try {
-    const response = await axios.post(
-      url + "/api/order/userorders", 
-      {}, 
-      { headers: { token } }
-    );
-    
-    const ordersData = response.data.data;
-    setData(ordersData);
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.post(
+        url + "/api/order/userorders", 
+        {}, 
+        { headers: { token } }
+      );
+      
+      const ordersData = response.data.data;
+      setData(ordersData);
 
-    if (orderId) {
-      const orderExists = ordersData.some(order => order._id === orderId);
-      if (orderExists) {
-        setSelectedOrderId(orderId);
-      } else {
-        if (ordersData.length > 0) {
-          setSelectedOrderId(ordersData[0]._id);
-          toast.warning(t('trackOrder.orderNotFound'));
+      // Tính thời gian giao hàng cho mỗi đơn hàng và cập nhật state
+      const newDeliveryTimes = {};
+      ordersData.forEach(order => {
+        newDeliveryTimes[order._id] = calculateDeliveryTime(order.coordinates);
+      });
+      setDeliveryTimes(newDeliveryTimes);
+
+      if (orderId) {
+        const orderExists = ordersData.some(order => order._id === orderId);
+        if (orderExists) {
+          setSelectedOrderId(orderId);
+        } else {
+          if (ordersData.length > 0) {
+            setSelectedOrderId(ordersData[0]._id);
+            toast.warning(t('trackOrder.orderNotFound'));
+          }
         }
+      } else if (ordersData.length > 0) {
+        setSelectedOrderId(ordersData[0]._id);
       }
-    } else if (ordersData.length > 0) {
-      setSelectedOrderId(ordersData[0]._id);
+      
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error(t('trackOrder.errorFetchingOrders'));
+      setLoading(false);
     }
-    
-    setLoading(false);
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    toast.error(t('trackOrder.errorFetchingOrders'));
-    setLoading(false);
-  }
-};
+  };
 
   const initializeMap = (order) => {
     if (!order || !window.L) return;
@@ -164,14 +170,13 @@ const fetchOrders = async () => {
         console.warn("Error loading MapLibre GL layer:", mapLibreError);
       }
 
-      // Add store marker
       const storeIcon = window.L.divIcon({
         html: `<div class="store-marker"><i class="fas fa-store"></i></div>`,
         className: 'store-icon',
         iconSize: [30, 30]
       });
 
-      const storeMarker = window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
+      window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
         icon: storeIcon
       })
         .addTo(map)
@@ -189,7 +194,7 @@ const fetchOrders = async () => {
         iconSize: [30, 30]
       });
 
-      const deliveryMarker = window.L.marker([coordinates.lat, coordinates.lng], {
+      window.L.marker([coordinates.lat, coordinates.lng], {
         icon: deliveryIcon
       })
         .addTo(map)
@@ -205,7 +210,7 @@ const fetchOrders = async () => {
         .openPopup();
 
       // Draw a line between store and delivery location
-      const polyline = window.L.polyline([
+      window.L.polyline([
         [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
         [coordinates.lat, coordinates.lng]
       ], {
@@ -223,7 +228,6 @@ const fetchOrders = async () => {
   };
 
   useEffect(() => {
-    let scriptsLoaded = false;
     let scriptLoadTimer = null;
 
     // Add Font Awesome for map icons
@@ -255,8 +259,6 @@ const fetchOrders = async () => {
 
       // After Leaflet loads
       leafletScript.onload = () => {
-        // We can technically initialize a basic map with just Leaflet
-        scriptsLoaded = true;
         clearTimeout(scriptLoadTimer);
 
         // Try to load MapLibre for enhanced maps, but we can fall back to standard Leaflet
@@ -287,8 +289,6 @@ const fetchOrders = async () => {
         }
       };
     } else {
-      scriptsLoaded = true;
-
       if (data.length > 0 && window.L) {
         const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
         initializeMap(orderToDisplay);
@@ -355,7 +355,7 @@ const fetchOrders = async () => {
       ) : (
         <div className="track-order-container">
           {/* Map container */}
-          <div id="map-container" ref={mapContainerRef} className="map-container"></div>
+          <div id="map-container" className="map-container"></div>
 
           {/* Orders list */}
           <div className="orders-list">

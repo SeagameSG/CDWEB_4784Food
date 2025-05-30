@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
     password:{type: String, required:true},
     coordinates:{type: Object, default:{lat: 10.8685, lng: 106.7800}},
     cartData:{type: Object, default:{}},
-    gender:{type: String, enum: ['male', 'female', 'other'], default: ''},
-    phone:{type: String, default: ''}
+    gender:{type: String, enum: ['male', 'female', 'other'], default: 'other'},
+    phone:{type: String, default: '1'}
 },{minimize:false})
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

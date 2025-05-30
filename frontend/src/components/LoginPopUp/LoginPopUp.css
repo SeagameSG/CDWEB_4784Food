@@ -83,6 +83,16 @@
     box-shadow: 0 0 0 0.2rem rgba(0, 105, 92, 0.25);
 }
 
+.login-popup-inputs input:invalid {
+  border: 2px solid #ff5252;
+  background-color: rgba(255, 82, 82, 0.05);
+}
+
+.login-popup-inputs input:focus:invalid {
+  border-color: #ff5252;
+  box-shadow: 0 0 0 0.2rem rgba(255, 82, 82, 0.25);
+}
+
 /* Stylish Login Button */
 .login-pop-up-container button {
     border: none;
