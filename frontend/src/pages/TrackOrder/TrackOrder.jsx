@@ -7,6 +7,8 @@ import { useSearchParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 const TrackOrder = () => {
   const { t } = useTranslation();
@@ -17,18 +19,22 @@ const TrackOrder = () => {
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
   const [selectedOrderId, setSelectedOrderId] = useState(orderId || null);
-  const mapInstanceRef = useRef(null);
+  const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
   
   const [deliveryTimes, setDeliveryTimes] = useState({});
+
+  // MapTiler API key from environment variables
+  const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
 
   // Default coordinates 4784Food
   const STORE_COORDINATES = { lat: 10.8499, lng: 106.8118 };
   
   const DEFAULT_COORDINATES = { lat: 10.8231, lng: 106.6297 };
 
-  // Haversine
+  // Haversine formula to calculate distance between two coordinates
   const calculateDistance = (coords1, coords2) => {
-    const R = 6371;
+    const R = 6371; // Earth's radius in km
     const dLat = (coords2.lat - coords1.lat) * Math.PI / 180;
     const dLon = (coords2.lng - coords1.lng) * Math.PI / 180;
     const a = 
@@ -40,7 +46,7 @@ const TrackOrder = () => {
     return distance;
   };
 
-  // Cập nhật hàm này để thực sự sử dụng và cập nhật deliveryTimes
+  // Calculate estimated delivery time based on distance
   const calculateDeliveryTime = (orderCoordinates) => {
     if (!validateCoordinates(orderCoordinates)) {
       return {
@@ -51,7 +57,9 @@ const TrackOrder = () => {
 
     const distance = calculateDistance(STORE_COORDINATES, orderCoordinates);
 
+    // Assume average speed of 0.5 km/minute (30 km/h)
     const travelTime = distance / 0.5;
+    // Add 20 minutes for food preparation
     const totalMinutes = Math.ceil(20 + travelTime);
 
     let formattedTime;
@@ -71,6 +79,7 @@ const TrackOrder = () => {
     return { minutes: totalMinutes, formatted: formattedTime };
   };
 
+  // Validate coordinates to ensure they are valid
   const validateCoordinates = (coords) => {
     if (!coords) return false;
     if (typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return false;
@@ -80,6 +89,7 @@ const TrackOrder = () => {
     return true;
   };
 
+  // Fetch orders from API
   const fetchOrders = async () => {
     try {
       const response = await axios.post(
@@ -91,13 +101,14 @@ const TrackOrder = () => {
       const ordersData = response.data.data;
       setData(ordersData);
 
-      // Tính thời gian giao hàng cho mỗi đơn hàng và cập nhật state
+      // Calculate delivery time for each order
       const newDeliveryTimes = {};
       ordersData.forEach(order => {
         newDeliveryTimes[order._id] = calculateDeliveryTime(order.coordinates);
       });
       setDeliveryTimes(newDeliveryTimes);
 
+      // Set selected order ID
       if (orderId) {
         const orderExists = ordersData.some(order => order._id === orderId);
         if (orderExists) {
@@ -120,16 +131,19 @@ const TrackOrder = () => {
     }
   };
 
+  // Initialize MapLibre map with MapTiler
   const initializeMap = (order) => {
-    if (!order || !window.L) return;
+    if (!order) return;
 
     setSelectedOrderId(order._id);
 
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.remove();
-      mapInstanceRef.current = null;
+    // Clean up existing map if any
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
     }
 
+    // Set coordinates, use default if invalid
     let coordinates = DEFAULT_COORDINATES;
     if (validateCoordinates(order.coordinates)) {
       coordinates = order.coordinates;
@@ -138,87 +152,103 @@ const TrackOrder = () => {
     }
 
     try {
-      const bounds = [
-        [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
-        [coordinates.lat, coordinates.lng]
-      ];
-
-      // Create Leaflet map with bounds
-      const map = window.L.map('map-container', {
+      // Create new MapLibre map
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
         center: [
-          (STORE_COORDINATES.lat + coordinates.lat) / 2,
-          (STORE_COORDINATES.lng + coordinates.lng) / 2
+          (STORE_COORDINATES.lng + coordinates.lng) / 2,
+          (STORE_COORDINATES.lat + coordinates.lat) / 2
         ],
         zoom: 12
       });
 
-      map.fitBounds(bounds, { padding: [50, 50] });
+      // Store map reference for cleanup
+      mapRef.current = map;
 
-      // Store the map instance for later cleanup
-      mapInstanceRef.current = map;
+      // Add navigation controls
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+      // Wait for map to load before adding markers
+      map.on('load', () => {
+        // Fit map to show both store and delivery locations
+        const bounds = new maplibregl.LngLatBounds()
+          .extend([STORE_COORDINATES.lng, STORE_COORDINATES.lat])
+          .extend([coordinates.lng, coordinates.lat]);
+        
+        map.fitBounds(bounds, { padding: 100 });
 
-      try {
-        window.L.maplibreGL({
-          style: 'https://tiles.openfreemap.org/styles/liberty',
-          attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-      } catch (mapLibreError) {
-        console.warn("Error loading MapLibre GL layer:", mapLibreError);
-      }
+        // Add store marker
+        const storeEl = document.createElement('div');
+        storeEl.className = 'store-marker';
+        storeEl.innerHTML = '<i class="fas fa-store"></i>';
 
-      const storeIcon = window.L.divIcon({
-        html: `<div class="store-marker"><i class="fas fa-store"></i></div>`,
-        className: 'store-icon',
-        iconSize: [30, 30]
+        new maplibregl.Marker(storeEl)
+          .setLngLat([STORE_COORDINATES.lng, STORE_COORDINATES.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="map-popup store-popup">
+                  <h3>${t('trackOrder.storeName')}</h3>
+                  <p>${t('trackOrder.storeDescription')}</p>
+                </div>
+              `)
+          )
+          .addTo(map);
+
+        // Add delivery location marker
+        const deliveryEl = document.createElement('div');
+        deliveryEl.className = 'delivery-marker';
+        deliveryEl.innerHTML = '<i class="fas fa-map-marker"></i>';
+
+        new maplibregl.Marker(deliveryEl)
+          .setLngLat([coordinates.lng, coordinates.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="map-popup">
+                  <h3>${t('trackOrder.deliveryAddress')}</h3>
+                  <p>${order.address.street || ''}, ${order.address.city || ''}</p>
+                  <p>${order.address.state || ''}, ${order.address.country || ''}</p>
+                  <p><strong>${t('trackOrder.status')}:</strong> ${order.status || t('trackOrder.processing')}</p>
+                  <p><strong>${t('trackOrder.estimatedDeliveryTime')}:</strong> ${deliveryTimes[order._id]?.formatted || t('trackOrder.defaultDeliveryTime')}</p>
+                </div>
+              `)
+          )
+          .addTo(map);
+
+        // Draw a line between store and delivery location
+        map.addSource('route', {
+          'type': 'geojson',
+          'data': {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'type': 'LineString',
+              'coordinates': [
+                [STORE_COORDINATES.lng, STORE_COORDINATES.lat],
+                [coordinates.lng, coordinates.lat]
+              ]
+            }
+          }
+        });
+
+        map.addLayer({
+          'id': 'route',
+          'type': 'line',
+          'source': 'route',
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': '#FF5733',
+            'line-width': 3,
+            'line-opacity': 0.7,
+            'line-dasharray': [2, 2]
+          }
+        });
       });
-
-      window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
-        icon: storeIcon
-      })
-        .addTo(map)
-        .bindPopup(`
-          <div class="map-popup store-popup">
-            <h3>${t('trackOrder.storeName')}</h3>
-            <p>${t('trackOrder.storeDescription')}</p>
-          </div>
-        `);
-
-      // Add delivery location marker
-      const deliveryIcon = window.L.divIcon({
-        html: `<div class="delivery-marker"><i class="fas fa-map-marker"></i></div>`,
-        className: 'delivery-icon',
-        iconSize: [30, 30]
-      });
-
-      window.L.marker([coordinates.lat, coordinates.lng], {
-        icon: deliveryIcon
-      })
-        .addTo(map)
-        .bindPopup(`
-          <div class="map-popup">
-            <h3>${t('trackOrder.deliveryAddress')}</h3>
-            <p>${order.address.street || ''}, ${order.address.city || ''}</p>
-            <p>${order.address.state || ''}, ${order.address.country || ''}</p>
-            <p><strong>${t('trackOrder.status')}:</strong> ${order.status || t('trackOrder.processing')}</p>
-            <p><strong>${t('trackOrder.estimatedDeliveryTime')}:</strong> ${deliveryTimes[order._id]?.formatted || t('trackOrder.defaultDeliveryTime')}</p>
-          </div>
-        `)
-        .openPopup();
-
-      // Draw a line between store and delivery location
-      window.L.polyline([
-        [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
-        [coordinates.lat, coordinates.lng]
-      ], {
-        color: '#FF5733',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '10, 10'
-      }).addTo(map);
 
       return map;
     } catch (error) {
@@ -227,95 +257,36 @@ const TrackOrder = () => {
     }
   };
 
+  // Load FontAwesome for map icons
   useEffect(() => {
-    let scriptLoadTimer = null;
-
-    // Add Font Awesome for map icons
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
-
-    // Check if scripts are already loaded
-    if (!document.querySelector('script[src*="leaflet"]')) {
-      // Add Leaflet CSS
-      const leafletCss = document.createElement('link');
-      leafletCss.rel = 'stylesheet';
-      leafletCss.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
-      document.head.appendChild(leafletCss);
-
-      // Add Leaflet JS first, and only add MapLibre if needed
-      const leafletScript = document.createElement('script');
-      leafletScript.src = 'https://unpkg.com/leaflet/dist/leaflet.js';
-      document.body.appendChild(leafletScript);
-
-      // Set a timeout to prevent waiting forever if scripts fail to load
-      scriptLoadTimer = setTimeout(() => {
-        if (!window.L) {
-          console.warn("Map scripts failed to load in a timely manner");
-          setLoading(false);
-        }
-      }, 10000); // 10 second timeout
-
-      // After Leaflet loads
-      leafletScript.onload = () => {
-        clearTimeout(scriptLoadTimer);
-
-        // Try to load MapLibre for enhanced maps, but we can fall back to standard Leaflet
-        try {
-          const maplibreScript = document.createElement('script');
-          maplibreScript.src = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.js';
-          document.body.appendChild(maplibreScript);
-
-          // After MapLibre GL loads, add the Leaflet plugin
-          maplibreScript.onload = () => {
-            // Add MapLibre GL CSS
-            const maplibreCss = document.createElement('link');
-            maplibreCss.rel = 'stylesheet';
-            maplibreCss.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css';
-            document.head.appendChild(maplibreCss);
-
-            const maplibreLeafletScript = document.createElement('script');
-            maplibreLeafletScript.src = 'https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js';
-            document.body.appendChild(maplibreLeafletScript);
-          };
-        } catch (error) {
-          console.warn("Error loading MapLibre scripts:", error);
-        }
-
-        if (data.length > 0) {
-          const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
-          initializeMap(orderToDisplay);
-        }
-      };
-    } else {
-      if (data.length > 0 && window.L) {
-        const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
-        initializeMap(orderToDisplay);
-      }
+    // Add Font Awesome for map icons if not already loaded
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const fontAwesome = document.createElement('link');
+      fontAwesome.rel = 'stylesheet';
+      fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+      document.head.appendChild(fontAwesome);
     }
+  }, []);
 
-    return () => {
-      // Clean up map instance on component unmount
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      // Clear timeout if component unmounts
-      if (scriptLoadTimer) {
-        clearTimeout(scriptLoadTimer);
-      }
-    };
-  }, []); // Only run once on mount
-
+  // Initialize map when data is loaded
   useEffect(() => {
-    if (data.length > 0 && window.L) {
+    if (data.length > 0) {
       const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
       initializeMap(orderToDisplay);
     }
   }, [data, selectedOrderId]);
 
+  // Clean up map on component unmount
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Fetch orders when component mounts
   useEffect(() => {
     if (token) {
       fetchOrders();
@@ -340,6 +311,7 @@ const TrackOrder = () => {
     };
   }, [token]);
 
+  // Handle case when selected order is not found
   const orderToDisplay = data.find(order => order._id === selectedOrderId);
   if (!orderToDisplay && data.length > 0) {
     setSelectedOrderId(data[0]._id);
@@ -355,7 +327,7 @@ const TrackOrder = () => {
       ) : (
         <div className="track-order-container">
           {/* Map container */}
-          <div id="map-container" className="map-container"></div>
+          <div id="map-container" className="map-container" ref={mapContainerRef}></div>
 
           {/* Orders list */}
           <div className="orders-list">

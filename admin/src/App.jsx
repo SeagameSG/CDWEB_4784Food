@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import TrackOrder from './pages/TrackOrder/TrackOrder'
 import CouponManagement from './pages/CouponManagement/CouponManagement'
+import Reviews from './pages/Reviews/Reviews'
 import './App.css'
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
                     <Route path='/orders' element={<Orders url={url}/>} />
                     <Route path='/trackorder' element={<TrackOrder url={url}/>} />
                     <Route path='/coupons' element={<CouponManagement url={url}/>} />
+                    <Route path='/reviews' element={<Reviews url={url}/>} />
                 </Routes>
             </div>
         </>

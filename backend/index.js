@@ -8,6 +8,7 @@ import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import addressRouter from './routes/addressRoute.js';
 import couponRoutes from './routes/couponRoute.js';
+import reviewRouter from "./routes/reviewRoute.js";
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/coupon', couponRoutes);
+app.use('/api/review', reviewRouter);
 
 
 app.get("/", (req, res) => {

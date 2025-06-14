@@ -46,7 +46,21 @@
     "loading": "Đang tải..."
   },
   "customerReview": {
-    "title": "Đánh giá của khách hàng:"
+    "title": "Đánh giá của khách hàng:",
+    "searchPlaceholder": "Tìm kiếm theo tên món ăn...",
+    "addReview": "Thêm Đánh Giá",
+    "selectFood": "Chọn món ăn",
+    "customerName": "Tên của bạn",
+    "customerEmail": "Email của bạn",
+    "rating": "Đánh giá",
+    "star": "sao",
+    "stars": "sao",
+    "comment": "Nhận xét của bạn",
+    "submit": "Gửi Đánh Giá",
+    "submitting": "Đang gửi...",
+    "cancel": "Hủy",
+    "reviewAdded": "Đánh giá đã được thêm thành công!",
+    "addError": "Lỗi khi thêm đánh giá"
   },
   "aboutUs": {
     "title": "Về chúng tôi",
@@ -139,6 +153,13 @@
     "paymentStatusLabel": "Trạng thái thanh toán"
   },
   "placeOrder": {
+    "title": "Đặt Hàng",
+    "selectAddress": "Chọn Địa Chỉ Giao Hàng",
+    "noAddresses": "Bạn chưa có địa chỉ nào được lưu",
+    "addNewAddress": "Thêm Địa Chỉ Mới",
+    "cashOnDelivery": "Thanh Toán Khi Nhận Hàng",
+    "orderSummary": "Tóm Tắt Đơn Hàng",
+    "placeOrderButton": "Đặt Hàng",
     "shippingInfo": "Thông tin giao hàng",
     "savedAddresses": "Địa chỉ đã lưu",
     "defaultBadge": "Mặc định",
@@ -186,7 +207,8 @@
   "profileForm": {
     "tabs": {
       "profile": "Thông tin cá nhân",
-      "password": "Đổi mật khẩu"
+      "password": "Đổi mật khẩu",
+      "resetPassword": "Đặt lại mật khẩu"
     },
     "fullName": "Họ và tên",
     "email": "Email",
@@ -209,49 +231,99 @@
       "profileUpdated": "Đã cập nhật thông tin thành công"
     }
   },
-  "myAddress": {
-    "title": "Quản lý địa chỉ",
-    "addNewAddress": "Thêm địa chỉ mới",
-    "loading": "Đang tải...",
-    "noAddress": "Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ mới.",
-    "default": "Mặc định",
-    "makeDefault": "Đặt làm mặc định",
+  "addresses": {
+    "title": "Địa Chỉ Của Tôi",
+    "addNew": "Thêm Địa Chỉ Mới",
+    "noAddresses": "Bạn chưa có địa chỉ nào được lưu.",
     "edit": "Sửa",
-    "delete": "Xóa",
-    "editAddress": "Chỉnh sửa địa chỉ",
-    "addAddress": "Thêm địa chỉ mới",
-    "fullName": "Họ tên",
-    "phone": "Số điện thoại",
-    "street": "Số nhà, đường",
-    "city": "Thành phố",
+    "remove": "Xóa",
+    "setDefault": "Đặt làm Mặc định",
+    "default": "Mặc định",
+    "coordinates": "Tọa độ",
+    "editAddress": "Sửa Địa Chỉ",
+    "addAddress": "Thêm Địa Chỉ Mới",
+    "name": "Họ Tên",
+    "namePlaceholder": "Nhập họ tên của bạn",
+    "phone": "Số Điện Thoại",
+    "phonePlaceholder": "Nhập số điện thoại của bạn",
+    "street": "Địa Chỉ Đường",
+    "streetPlaceholder": "Nhập địa chỉ đường của bạn",
+    "city": "Thành Phố",
+    "cityPlaceholder": "Nhập thành phố của bạn",
     "state": "Tỉnh/Thành",
-    "zipCode": "Mã bưu điện",
-    "country": "Quốc gia",
-    "coordinates": "Tọa độ:",
-    "getCurrentLocation": "Lấy vị trí hiện tại",
-    "gettingLocation": "Đang lấy vị trí...",
-    "save": "Lưu",
-    "cancel": "Hủy"
+    "statePlaceholder": "Nhập tỉnh hoặc thành phố của bạn",
+    "zipcode": "Mã Bưu Điện",
+    "zipcodePlaceholder": "Nhập mã bưu điện của bạn",
+    "country": "Quốc Gia",
+    "countryPlaceholder": "Nhập quốc gia của bạn",
+    "makeDefault": "Đặt làm địa chỉ mặc định",
+    "selectLocation": "Chọn Vị Trí Trên Bản Đồ",
+    "mapInstructions": "Di chuyển bản đồ để đặt điểm đánh dấu tại vị trí chính xác của bạn",
+    "useMyLocation": "Dùng Vị Trí Hiện Tại",
+    "locating": "Đang lấy vị trí...",
+    "latitude": "Vĩ Độ",
+    "longitude": "Kinh Độ",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa địa chỉ này?",
+    "fetchError": "Không thể lấy danh sách địa chỉ",
+    "addSuccess": "Thêm địa chỉ thành công",
+    "addError": "Không thể thêm địa chỉ",
+    "updateSuccess": "Cập nhật địa chỉ thành công",
+    "updateError": "Không thể cập nhật địa chỉ",
+    "deleteSuccess": "Xóa địa chỉ thành công",
+    "deleteError": "Không thể xóa địa chỉ",
+    "defaultSuccess": "Đã cập nhật địa chỉ mặc định",
+    "defaultError": "Không thể cập nhật địa chỉ mặc định",
+    "locationError": "Không thể lấy vị trí của bạn",
+    "browserNotSupported": "Trình duyệt của bạn không hỗ trợ định vị",
+    "saveError": "Lỗi khi lưu địa chỉ"
   },
+
   "resetPassword": {
-    "title": "Đổi mật khẩu",
-    "currentPassword": "Mật khẩu hiện tại",
-    "newPassword": "Mật khẩu mới",
-    "confirmPassword": "Xác nhận mật khẩu mới",
-    "resetButton": "Đổi mật khẩu",
-    "processing": "Đang xử lý...",
-    "success": "Đổi mật khẩu thành công",
+    "title": "Đặt Lại Mật Khẩu",
+    "verifyEmail": "Xác Minh Email",
+    "sendOtp": "Gửi Mã OTP",
+    "enterOtp": "Nhập Mã OTP",
+    "otpSentTo": "Mã OTP đã được gửi đến",
+    "otp": "Mã Xác Thực (OTP)",
+    "otpPlaceholder": "Nhập mã OTP 6 chữ số",
+    "verifyOtp": "Xác Minh OTP",
+    "setNewPassword": "Đặt Mật Khẩu Mới",
+    "newPassword": "Mật Khẩu Mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "confirmPassword": "Xác Nhận Mật Khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+    "resetButton": "Đặt Lại Mật Khẩu",
+    "otpSent": "Mã OTP đã được gửi đến email của bạn",
+    "otpVerified": "Xác minh OTP thành công",
     "passwordStrength": {
-      "weak": "YẾU",
-      "good": "TRUNG BÌNH",
-      "strong": "MẠNH"
+      "weak": "Yếu",
+      "good": "Tốt",
+      "strong": "Mạnh"
     },
     "errors": {
-      "passwordsDoNotMatch": "Mật khẩu không khớp",
+      "emailRequired": "Email là bắt buộc",
+      "otpRequired": "Mã OTP là bắt buộc",
+      "passwordsDoNotMatch": "Mật khẩu không khớp!",
       "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
-      "resetFailed": "Đổi mật khẩu thất bại",
-      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng"
-    }
+      "resetFailed": "Đặt lại mật khẩu thất bại",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
+      "otpSendFailed": "Không thể gửi mã OTP",
+      "invalidOtp": "Mã OTP không hợp lệ hoặc đã hết hạn",
+      "verificationFailed": "Xác minh OTP thất bại"
+    },
+    "success": "Đặt lại mật khẩu thành công!"
+  },
+  "changePassword": {
+    "title": "Đổi Mật Khẩu",
+    "sendOtp": "Gửi Mã OTP đến Email",
+    "otpInfo": "Chúng tôi sẽ gửi mã xác minh đến địa chỉ email đã đăng ký của bạn vì mục đích bảo mật.",
+    "otp": "Mã Xác Minh (OTP)",
+    "otpPlaceholder": "Nhập mã 6 chữ số",
+    "newPassword": "Mật Khẩu Mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "confirmPassword": "Xác Nhận Mật Khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+    "changeButton": "Đổi Mật Khẩu"
   },
   "loginPopup": {
     "login": "Đăng nhập",
@@ -267,5 +339,11 @@
     "clickHere": "Bấm vào đây",
     "haveAccount": "Đã có tài khoản ? ",
     "loginHere": "Đăng nhập tại đây"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "back": "Quay lại"
   }
 }

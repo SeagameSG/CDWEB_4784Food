@@ -38,8 +38,7 @@ const PlaceOrder = () => {
       const response = await axios.post(`${url}/api/address/list`, {}, { headers: { token } });
       if (response.data.success) {
         setUserAddresses(response.data.data);
-        
-        // Set default address as selected if any
+
         const defaultAddress = response.data.data.find(addr => addr.isDefault);
         if (defaultAddress) {
           setSelectedAddressId(defaultAddress._id);
@@ -106,7 +105,7 @@ const PlaceOrder = () => {
 
   const placeOrder = async (event) => {
     event.preventDefault();
-    
+
     let orderItems = [];
     food_list.map((item) => {
       if (cartItems[item._id] > 0) {
@@ -118,21 +117,21 @@ const PlaceOrder = () => {
 
     let selectedAddress;
     let orderCoordinates;
-    
+
     const currentLanguage = i18next.language;
     // Convert to VNPay expected format: 'vn' for Vietnamese, 'en' for English
     const vnpLanguage = currentLanguage === 'vi' ? 'vn' : 'en';
-    
+
     const totalWithDiscount = getTotalWithDiscount();
     const finalAmount = totalWithDiscount + SHIPPING_FEE;
-    
+
     if (selectedAddressId) {
       selectedAddress = userAddresses.find(addr => addr._id === selectedAddressId);
       if (!selectedAddress) {
         toast.error(t('placeOrder.errors.selectAddress'));
         return;
       }
-      
+
       const addressData = {
         firstname: selectedAddress.name.split(' ')[0],
         lastname: selectedAddress.name.split(' ').slice(1).join(' '),
@@ -144,9 +143,9 @@ const PlaceOrder = () => {
         country: selectedAddress.country,
         phone: selectedAddress.phone
       };
-      
+
       orderCoordinates = selectedAddress.coordinates;
-      
+
       let orderData = {
         address: addressData,
         items: orderItems,
@@ -154,14 +153,14 @@ const PlaceOrder = () => {
         coordinates: orderCoordinates,
         language: vnpLanguage
       };
-      
+
       try {
         let response;
-        
+
         if (paymentMethod === 'vnpay') {
           // VNPAY payment
           response = await axios.post(url + "/api/order/place-vnpay", orderData, {headers: {token}});
-          
+
           if (response.data.success) {
             if (couponDiscount.appliedCoupon) {
               await markCouponAsUsed();
@@ -173,7 +172,7 @@ const PlaceOrder = () => {
         } else {
           // Cash on delivery
           response = await axios.post(url + "/api/order/place-cod", orderData, {headers: {token}});
-          
+
           if (response.data.success) {
             if (couponDiscount.appliedCoupon) {
               await markCouponAsUsed();
@@ -191,7 +190,7 @@ const PlaceOrder = () => {
     } else {
       const newAddress = data;
       orderCoordinates = newAddress.coordinates;
-      
+
       let orderData = {
         address: newAddress,
         items: orderItems,
@@ -199,14 +198,14 @@ const PlaceOrder = () => {
         coordinates: orderCoordinates,
         language: vnpLanguage
       };
-      
+
       try {
         let response;
-        
+
         if (paymentMethod === 'vnpay') {
           // VNPAY payment
           response = await axios.post(url + "/api/order/place-vnpay", orderData, {headers: {token}});
-          
+
           if (response.data.success) {
             if (couponDiscount.appliedCoupon) {
               await markCouponAsUsed();
@@ -218,7 +217,7 @@ const PlaceOrder = () => {
         } else {
           // Cash on delivery
           response = await axios.post(url + "/api/order/place-cod", orderData, {headers: {token}});
-          
+
           if (response.data.success) {
             if (couponDiscount.appliedCoupon) {
               await markCouponAsUsed();
@@ -241,28 +240,28 @@ const PlaceOrder = () => {
       <div className="payment-method-selection">
         <h3>{t('placeOrder.paymentMethod')}</h3>
         <div className="payment-options">
-          <div 
+          <div
             className={`payment-option ${paymentMethod === 'vnpay' ? 'selected' : ''}`}
             onClick={() => onChange('vnpay')}
           >
-            <input 
-              type="radio" 
-              id="vnpay" 
-              name="paymentMethod" 
+            <input
+              type="radio"
+              id="vnpay"
+              name="paymentMethod"
               value="vnpay"
               checked={paymentMethod === 'vnpay'}
               onChange={() => onChange('vnpay')}
             />
             <label htmlFor="vnpay">{t('placeOrder.vnpay')}</label>
           </div>
-          <div 
+          <div
             className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`}
             onClick={() => onChange('cod')}
           >
-            <input 
-              type="radio" 
-              id="cod" 
-              name="paymentMethod" 
+            <input
+              type="radio"
+              id="cod"
+              name="paymentMethod"
               value="cod"
               checked={paymentMethod === 'cod'}
               onChange={() => onChange('cod')}
@@ -271,7 +270,7 @@ const PlaceOrder = () => {
           </div>
         </div>
         <p className="payment-info">
-          {paymentMethod === 'vnpay' 
+          {paymentMethod === 'vnpay'
             ? t('placeOrder.paymentInfo.vnpay')
             : t('placeOrder.paymentInfo.cod')
           }
@@ -285,22 +284,21 @@ const PlaceOrder = () => {
       <form className='place-order' onSubmit={placeOrder}>
         <div className="place-order-left">
           <p className="title">{t('placeOrder.shippingInfo')}</p>
-          
           {/* Saved Addresses Section */}
           {!loading && userAddresses.length > 0 && (
             <div className="saved-addresses">
               <h3>{t('placeOrder.savedAddresses')}</h3>
               <div className="address-selection">
                 {userAddresses.map((address) => (
-                  <div 
-                    key={address._id} 
+                  <div
+                    key={address._id}
                     className={`address-option ${selectedAddressId === address._id ? 'selected' : ''}`}
                     onClick={() => handleAddressSelect(address._id)}
                   >
                     <div className="address-option-checkbox">
-                      <input 
-                        type="radio" 
-                        name="addressId" 
+                      <input
+                        type="radio"
+                        name="addressId"
                         checked={selectedAddressId === address._id}
                         onChange={() => handleAddressSelect(address._id)}
                       />
@@ -314,13 +312,13 @@ const PlaceOrder = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="use-new-address">
                 <label htmlFor="useNewAddress" className="new-address-label">
-                  <input 
-                    type="radio" 
-                    name="addressId" 
-                    id="useNewAddress" 
+                  <input
+                    type="radio"
+                    name="addressId"
+                    id="useNewAddress"
                     checked={!selectedAddressId}
                     onChange={() => setSelectedAddressId(null)}
                   />
@@ -330,7 +328,7 @@ const PlaceOrder = () => {
               </div>
             </div>
           )}
-          
+
           {/* New Address Form */}
           {(!userAddresses.length || !selectedAddressId) && (
             <div className="new-address-form">
@@ -349,7 +347,7 @@ const PlaceOrder = () => {
                 <input name='country' onChange={onChangeHandler} value={data.country} type="text" placeholder={t('placeOrder.country')} required />
               </div>
               <input name='phone' onChange={onChangeHandler} value={data.phone} type="text" placeholder={t('placeOrder.phone')} required />
-              
+
               <div className="location-section">
                 <div className="coordinates-display">
                   <p>{t('placeOrder.coordinates')} {data.coordinates.lat.toFixed(4)}, {data.coordinates.lng.toFixed(4)}</p>
@@ -374,9 +372,9 @@ const PlaceOrder = () => {
                 <>
                   <div className="cart-total-details coupon-discount">
                     <p>
-                      {t('cart.discount')} ({couponDiscount.appliedCoupon.discountPercentage}% 
-                      {couponDiscount.affectedCategories !== "all items" 
-                        ? ` ${t('cart.for')} ${couponDiscount.affectedCategories}` 
+                      {t('cart.discount')} ({couponDiscount.appliedCoupon.discountPercentage}%
+                      {couponDiscount.affectedCategories !== "all items"
+                        ? ` ${t('cart.for')} ${couponDiscount.affectedCategories}`
                         : ''})
                     </p>
                     <p>-₫{couponDiscount.discountAmount}</p>
@@ -394,14 +392,14 @@ const PlaceOrder = () => {
                 <b>₫{getTotalCartAmount() === 0 ? 0 : getTotalWithDiscount() + SHIPPING_FEE}</b>
               </div>
             </div>
-            
+
             {/* Payment Method Selection */}
-            <PaymentMethodSelection 
-              paymentMethod={paymentMethod} 
-              onChange={handlePaymentMethodChange} 
-              t={t} 
+            <PaymentMethodSelection
+              paymentMethod={paymentMethod}
+              onChange={handlePaymentMethodChange}
+              t={t}
             />
-            
+
             <button type='submit'>{t('placeOrder.orderNow')}</button>
           </div>
         </div>

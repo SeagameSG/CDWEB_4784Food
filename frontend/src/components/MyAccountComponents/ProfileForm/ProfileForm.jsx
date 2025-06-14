@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './ProfileForm.css';
 import { assets } from '../../../assets/assets';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { StoreContext } from '../../../context/StoreContext';
 
 const ProfileForm = () => {
   const { t } = useTranslation();
+  const { url } = useContext(StoreContext);
   const [image, setImage] = useState(assets.default_profile_icon);
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile' hoặc 'password'
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'password', or 'reset'
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -25,6 +27,11 @@ const ProfileForm = () => {
   });
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [error, setError] = useState('');
+
+  // For OTP password change
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
   
   // Lấy thông tin người dùng khi component được tải
   useEffect(() => {
@@ -40,7 +47,7 @@ const ProfileForm = () => {
         return;
       }
       
-      const response = await axios.get('http://localhost:3000/api/user/profile', {
+      const response = await axios.get(`${url}/api/user/profile`, {
         headers: { token }
       });
       
@@ -76,7 +83,7 @@ const ProfileForm = () => {
       }
       
       const response = await axios.post(
-        'http://localhost:3000/api/user/profile/update',
+        `${url}/api/user/profile/update`,
         {
           name: userData.name,
           phone: userData.phone,
@@ -121,7 +128,38 @@ const ProfileForm = () => {
     return t('resetPassword.passwordStrength.strong');
   };
   
-  const handleResetPassword = async (e) => {
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error(t('profileForm.errors.notLoggedIn'));
+        return;
+      }
+      
+      const response = await axios.post(
+        `${url}/api/user/profile/request-otp`,
+        {},
+        { headers: { token } }
+      );
+      
+      if (response.data.success) {
+        toast.success(t('resetPassword.otpSent'));
+        setOtpSent(true);
+      } else {
+        toast.error(response.data.message || t('resetPassword.errors.otpSendFailed'));
+      }
+    } catch (error) {
+      console.error('Error requesting OTP:', error);
+      toast.error(t('resetPassword.errors.otpSendFailed'));
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleVerifyAndChangePassword = async (e) => {
     e.preventDefault();
     setError('');
     
@@ -135,7 +173,7 @@ const ProfileForm = () => {
       return;
     }
     
-    setLoading(true);
+    setVerifying(true);
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -144,9 +182,9 @@ const ProfileForm = () => {
       }
       
       const response = await axios.post(
-        'http://localhost:3000/api/user/profile/reset-password',
+        `${url}/api/user/profile/change-password-with-otp`,
         {
-          currentPassword: passwordData.currentPassword,
+          otp,
           newPassword: passwordData.newPassword
         },
         { headers: { token } }
@@ -159,15 +197,17 @@ const ProfileForm = () => {
           newPassword: '',
           confirmPassword: ''
         });
+        setOtp('');
+        setOtpSent(false);
         setPasswordStrength(0);
       } else {
         setError(response.data.message || t('resetPassword.errors.resetFailed'));
       }
     } catch (error) {
-      console.error('Error resetting password:', error);
+      console.error('Error changing password:', error);
       setError(t('resetPassword.errors.resetFailed'));
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
   };
   
@@ -214,7 +254,7 @@ const ProfileForm = () => {
         </button>
       </div>
       
-      {activeTab === 'profile' ? (
+      {activeTab === 'profile' && (
         <div className="profile-content">
           <div className="profile-left">
             <div className="add-image-upload">
@@ -315,80 +355,100 @@ const ProfileForm = () => {
             </button>
           </form>
         </div>
-      ) : (
-        <div className="password-reset-section">
-          <h3>{t('resetPassword.title')}</h3>
+      )}
+      
+      {activeTab === 'password' && (
+        <div className="password-change-section">
+          <h3>{t('changePassword.title')}</h3>
           
-          <form onSubmit={handleResetPassword}>
-            <div className="form-row">
+          {!otpSent ? (
+            <form onSubmit={handleSendOtp}>
+              <p className="info-text">{t('changePassword.otpInfo')}</p>
+              <button 
+                type="submit" 
+                className="update-btn" 
+                disabled={loading}
+              >
+                {loading ? t('common.loading') : t('changePassword.sendOtp')}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyAndChangePassword}>
+              {error && <div className="error-message">{error}</div>}
+              
               <div className="input-group">
-                <label>{t('resetPassword.currentPassword')}</label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={passwordData.currentPassword}
-                  onChange={handlePasswordChange}
-                  placeholder={t('resetPassword.currentPassword')}
-                  required
+                <label>{t('changePassword.otp')}</label>
+                <input 
+                  type="text" 
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder={t('changePassword.otpPlaceholder')}
+                  required 
                 />
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <div className="input-group">
-                <label>{t('resetPassword.newPassword')}</label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder={t('resetPassword.newPassword')}
-                  required
-                />
-                
-                {/* Password Strength Bar */}
-                <div className="password-strength-container">
-                  <div className="password-strength-bar">
-                    <div 
-                      className="bar" 
-                      style={{ 
-                        width: `${(passwordStrength / 4) * 100}%`,
-                        backgroundColor: 
-                          passwordStrength === 1 ? 'red' : 
-                          passwordStrength === 2 ? 'orange' : 
-                          passwordStrength >= 3 ? 'green' : '#ddd' 
-                      }}
-                    ></div>
-                  </div>
-                  <p className={`strength-label level-${passwordStrength}`}>
-                    {getStrengthLabel()}
-                  </p>
-                </div>
               </div>
               
               <div className="input-group">
-                <label>{t('resetPassword.confirmPassword')}</label>
-                <input
-                  type="password"
+                <label>{t('changePassword.newPassword')}</label>
+                <input 
+                  type="password" 
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder={t('changePassword.newPasswordPlaceholder')}
+                  required 
+                />
+                
+                {passwordData.newPassword && (
+                  <div className="password-strength-container">
+                    <div className="password-strength-bar">
+                      <div 
+                        className="bar" 
+                        style={{ 
+                          width: `${passwordStrength * 25}%`,
+                          backgroundColor: 
+                            passwordStrength === 1 ? 'red' : 
+                            passwordStrength === 2 ? 'orange' : 
+                            'green'
+                        }}
+                      ></div>
+                    </div>
+                    <span className={`strength-label level-${passwordStrength}`}>
+                      {getStrengthLabel()}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="input-group">
+                <label>{t('changePassword.confirmPassword')}</label>
+                <input 
+                  type="password" 
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
-                  placeholder={t('resetPassword.confirmPassword')}
-                  required
+                  placeholder={t('changePassword.confirmPasswordPlaceholder')}
+                  required 
                 />
               </div>
-            </div>
-            
-            {error && <p className="error-message">{error}</p>}
-            
-            <button 
-              type="submit" 
-              className="update-btn" 
-              disabled={loading}
-            >
-              {loading ? t('resetPassword.processing') : t('resetPassword.resetButton')}
-            </button>
-          </form>
+              
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="secondary-btn"
+                  onClick={() => setOtpSent(false)}
+                >
+                  {t('common.back')}
+                </button>
+                <button 
+                  type="submit" 
+                  className="update-btn" 
+                  disabled={verifying || passwordStrength < 2}
+                >
+                  {verifying ? t('common.loading') : t('changePassword.changeButton')}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       )}
     </div>
