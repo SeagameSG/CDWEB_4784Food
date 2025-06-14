@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import './MyAddress.css';
 import { StoreContext } from '../../../context/StoreContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 const MyAddress = () => {
   const { t } = useTranslation();
@@ -27,6 +29,13 @@ const MyAddress = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentAddressId, setCurrentAddressId] = useState(null);
   const [gettingLocation, setGettingLocation] = useState(false);
+  
+  // Map related refs and state
+  const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const mapLoaded = useRef(false);
+  const crosshair = useRef(null);
 
   // Fetch all addresses
   const fetchAddresses = async () => {
@@ -36,12 +45,12 @@ const MyAddress = () => {
       if (response.data.success) {
         setAddresses(response.data.data);
       } else {
-        toast.error("Failed to fetch addresses");
+        toast.error(t('addresses.fetchError'));
       }
       setLoading(false);
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      toast.error("Error fetching addresses");
+      toast.error(t('addresses.fetchError'));
       setLoading(false);
     }
   };
@@ -52,10 +61,81 @@ const MyAddress = () => {
     }
   }, [token]);
 
+  // Initialize map when form is shown
+  useEffect(() => {
+    if (showForm && mapContainer.current && !map.current) {
+      map.current = new maplibregl.Map({
+        container: mapContainer.current,
+        style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
+        center: [newAddress.coordinates.lng, newAddress.coordinates.lat],
+        zoom: 14
+      });
+
+      map.current.on('load', () => {
+        mapLoaded.current = true;
+        
+        // Add crosshair to center of map
+        const el = document.createElement('div');
+        el.className = 'map-crosshair';
+        el.innerHTML = '+'
+        crosshair.current = el;
+        
+        const crosshairContainer = document.createElement('div');
+        crosshairContainer.className = 'crosshair-container';
+        crosshairContainer.appendChild(el);
+        map.current.getContainer().appendChild(crosshairContainer);
+        
+        // Update coordinates on map move
+        map.current.on('moveend', () => {
+          const center = map.current.getCenter();
+          setNewAddress(prev => ({
+            ...prev,
+            coordinates: {
+              lat: center.lat,
+              lng: center.lng
+            }
+          }));
+        });
+      });
+
+      // Clean up map on unmount
+      return () => {
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+          mapLoaded.current = false;
+        }
+      };
+    }
+  }, [showForm]);
+
+  // Update map center when coordinates change directly from inputs
+  useEffect(() => {
+    if (map.current && mapLoaded.current) {
+      map.current.setCenter([newAddress.coordinates.lng, newAddress.coordinates.lat]);
+    }
+  }, [newAddress.coordinates.lat, newAddress.coordinates.lng]);
+
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewAddress({ ...newAddress, [name]: value });
+    
+    if (name === 'lat' || name === 'lng') {
+      // Handle coordinate input changes
+      const numValue = parseFloat(value);
+      
+      if (!isNaN(numValue)) {
+        setNewAddress(prev => ({
+          ...prev,
+          coordinates: {
+            ...prev.coordinates,
+            [name]: numValue
+          }
+        }));
+      }
+    } else {
+      setNewAddress({ ...newAddress, [name]: value });
+    }
   };
 
   // Get user's location
@@ -64,23 +144,30 @@ const MyAddress = () => {
       setGettingLocation(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          const coordinates = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          
           setNewAddress(prev => ({
             ...prev,
-            coordinates: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            }
+            coordinates
           }));
+          
+          if (map.current) {
+            map.current.setCenter([coordinates.lng, coordinates.lat]);
+          }
+          
           setGettingLocation(false);
         },
         (error) => {
           console.error("Error getting location:", error);
           setGettingLocation(false);
-          toast.error("Could not get your location. Using default location.");
+          toast.error(t('addresses.locationError'));
         }
       );
     } else {
-      toast.error("Your browser doesn't support geolocation");
+      toast.error(t('addresses.browserNotSupported'));
     }
   };
 
@@ -96,11 +183,11 @@ const MyAddress = () => {
         );
         
         if (response.data.success) {
-          toast.success("Address updated successfully");
+          toast.success(t('addresses.updateSuccess'));
           fetchAddresses();
           resetForm();
         } else {
-          toast.error(response.data.message);
+          toast.error(response.data.message || t('addresses.updateError'));
         }
       } else {
         // Add new address
@@ -111,20 +198,19 @@ const MyAddress = () => {
         );
         
         if (response.data.success) {
-          toast.success("Address added successfully");
+          toast.success(t('addresses.addSuccess'));
           fetchAddresses();
           resetForm();
         } else {
-          toast.error(response.data.message);
+          toast.error(response.data.message || t('addresses.addError'));
         }
       }
     } catch (error) {
       console.error("Error saving address:", error);
-      toast.error("Error saving address");
+      toast.error(t('addresses.saveError'));
     }
   };
 
-  // Edit address
   const editAddress = (address) => {
     setNewAddress({
       name: address.name,
@@ -142,49 +228,48 @@ const MyAddress = () => {
     setShowForm(true);
   };
 
-  // Delete address
-  const removeAddress = async (id) => {
-    try {
-      const response = await axios.post(
-        `${url}/api/address/delete`, 
-        { addressId: id }, 
-        { headers: { token } }
-      );
-      
-      if (response.data.success) {
-        toast.success("Address removed successfully");
-        fetchAddresses();
-      } else {
-        toast.error(response.data.message);
+  const deleteAddress = async (addressId) => {
+    if (window.confirm(t('addresses.confirmDelete'))) {
+      try {
+        const response = await axios.post(
+          `${url}/api/address/delete`,
+          { addressId },
+          { headers: { token } }
+        );
+        
+        if (response.data.success) {
+          toast.success(t('addresses.deleteSuccess'));
+          fetchAddresses();
+        } else {
+          toast.error(response.data.message || t('addresses.deleteError'));
+        }
+      } catch (error) {
+        console.error("Error deleting address:", error);
+        toast.error(t('addresses.deleteError'));
       }
-    } catch (error) {
-      console.error("Error deleting address:", error);
-      toast.error("Error deleting address");
     }
   };
 
-  // Set as default address
-  const setAsDefault = async (id) => {
+  const setDefaultAddress = async (addressId) => {
     try {
       const response = await axios.post(
-        `${url}/api/address/set-default`, 
-        { addressId: id }, 
+        `${url}/api/address/set-default`,
+        { addressId },
         { headers: { token } }
       );
       
       if (response.data.success) {
-        toast.success("Default address updated");
+        toast.success(t('addresses.defaultSuccess'));
         fetchAddresses();
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data.message || t('addresses.defaultError'));
       }
     } catch (error) {
       console.error("Error setting default address:", error);
-      toast.error("Error setting default address");
+      toast.error(t('addresses.defaultError'));
     }
   };
 
-  // Reset form
   const resetForm = () => {
     setNewAddress({
       name: "",
@@ -194,7 +279,7 @@ const MyAddress = () => {
       state: "",
       zipcode: "",
       country: "VietNam",
-      coordinates: { lat: 16.0544, lng: 108.2022 },
+      coordinates: {lat: 10.8685, lng: 106.7800},
       isDefault: false
     });
     setEditMode(false);
@@ -204,144 +289,200 @@ const MyAddress = () => {
 
   return (
     <div className="my-address">
-      {/* Title & Add Address Button at the Top */}
       <div className="address-header">
-        <h2>{t('myAddress.title')}</h2>
+        <h2>{t('addresses.title')}</h2>
         <button className="add-address-btn" onClick={() => setShowForm(true)}>
-          + {t('myAddress.addNewAddress')}
+          {t('addresses.addNew')}
         </button>
       </div>
-
-      {/* Address List */}
-      <div className="address-list">
-        {loading ? (
-          <p className="loading-text">{t('myAddress.loading')}</p>
-        ) : addresses.length === 0 ? (
-          <p className="no-address">{t('myAddress.noAddress')}</p>
-        ) : (
-          addresses.map((address) => (
+      
+      {loading ? (
+        <p>{t('common.loading')}</p>
+      ) : addresses.length === 0 ? (
+        <p className="no-addresses">{t('addresses.noAddresses')}</p>
+      ) : (
+        <div className="address-list">
+          {addresses.map((address) => (
             <div key={address._id} className={`address-card ${address.isDefault ? 'default' : ''}`}>
               <div className="address-details">
                 <div className="address-header-row">
-                  <p className="address-name">{address.name}</p>
-                  {address.isDefault && <span className="default-badge">{t('myAddress.default')}</span>}
+                  <h3 className="address-name">{address.name}</h3>
+                  {address.isDefault && <span className="default-badge">{t('addresses.default')}</span>}
                 </div>
+                <p className="address-text">{address.street}, {address.city}, {address.state}, {address.zipcode}</p>
                 <p className="address-text">{address.phone}</p>
-                <p className="address-text">{address.street}</p>
-                <p className="address-text">{address.city}, {address.state}</p>
-                <p className="address-text">{address.country}, {address.zipcode}</p>
                 <p className="address-coords">
-                  {t('myAddress.coordinates')} {address.coordinates.lat.toFixed(4)}, {address.coordinates.lng.toFixed(4)}
+                  {t('addresses.coordinates')}: {address.coordinates.lat.toFixed(5)}, {address.coordinates.lng.toFixed(5)}
                 </p>
               </div>
               <div className="address-actions">
+                <button className="edit-btn" onClick={() => editAddress(address)}>
+                  {t('addresses.edit')}
+                </button>
+                <button className="remove-btn" onClick={() => deleteAddress(address._id)}>
+                  {t('addresses.remove')}
+                </button>
                 {!address.isDefault && (
-                  <button className="default-btn" onClick={() => setAsDefault(address._id)}>
-                    {t('myAddress.makeDefault')}
+                  <button className="default-btn" onClick={() => setDefaultAddress(address._id)}>
+                    {t('addresses.setDefault')}
                   </button>
                 )}
-                <button className="edit-btn" onClick={() => editAddress(address)}>{t('myAddress.edit')}</button>
-                <button className="remove-btn" onClick={() => removeAddress(address._id)}>{t('myAddress.delete')}</button>
               </div>
             </div>
-          ))
-        )}
-      </div>
-
+          ))}
+        </div>
+      )}
+      
       {/* Address Form Modal */}
       {showForm && (
         <div className="address-modal">
-          <div className="address-form">
-            <h3>{editMode ? t('myAddress.editAddress') : t('myAddress.addAddress')}</h3>
-            <input 
-              type="text" 
-              name="name" 
-              placeholder={t('myAddress.fullName')}
-              value={newAddress.name} 
-              onChange={handleChange} 
-              required 
-              minLength="2"
-            />
-            <input 
-              type="text" 
-              name="phone" 
-              placeholder={t('myAddress.phone')}
-              value={newAddress.phone} 
-              onChange={handleChange} 
-              required 
-              pattern="[0-9]{10,11}"
-            />
-            <input 
-              type="text" 
-              name="street" 
-              placeholder={t('myAddress.street')}
-              value={newAddress.street} 
-              onChange={handleChange} 
-              required 
-              minLength="3"
-            />
-            <div className="form-row">
-              <input 
-                type="text" 
-                name="city" 
-                placeholder={t('myAddress.city')}
-                value={newAddress.city} 
-                onChange={handleChange} 
-                required 
-                minLength="2"
-              />
-              <input 
-                type="text" 
-                name="state" 
-                placeholder={t('myAddress.state')}
-                value={newAddress.state} 
-                onChange={handleChange} 
-                required 
-                minLength="2"
-              />
-            </div>
-            <div className="form-row">
-              <input 
-                type="text" 
-                name="zipcode" 
-                placeholder={t('myAddress.zipCode')}
-                value={newAddress.zipcode} 
-                onChange={handleChange} 
-                required 
-                pattern="[0-9]{5,6}"
-              />
-              <input 
-                type="text" 
-                name="country" 
-                placeholder={t('myAddress.country')}
-                value={newAddress.country} 
-                onChange={handleChange} 
-                required 
-                minLength="2"
-              />
+          <div className="address-modal-content">
+            <div className="modal-header">
+              <h3>{editMode ? t('addresses.editAddress') : t('addresses.addAddress')}</h3>
+              <button className="close-btn" onClick={resetForm}>&times;</button>
             </div>
             
-            <div className="location-section">
-              <div className="coordinates-display">
-                <p>{t('myAddress.coordinates')} {newAddress.coordinates.lat.toFixed(4)}, {newAddress.coordinates.lng.toFixed(4)}</p>
+            <div className="address-form">
+              <div className="form-group">
+                <label>{t('addresses.name')}</label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={newAddress.name} 
+                  onChange={handleChange} 
+                  placeholder={t('addresses.namePlaceholder')}
+                />
               </div>
-              <button 
-                type="button" 
-                className="get-location-btn" 
-                onClick={getUserLocation}
-                disabled={gettingLocation}
-              >
-                {gettingLocation ? t('myAddress.gettingLocation') : t('myAddress.getCurrentLocation')}
-              </button>
-            </div>
-            
-            <div className="form-actions">
-              <button type="button" className="save-btn" onClick={addAddress}>
-                {t('myAddress.save')}
-              </button>
-              <button type="button" className="cancel-btn" onClick={resetForm}>
-                {t('myAddress.cancel')}
-              </button>
+              
+              <div className="form-group">
+                <label>{t('addresses.phone')}</label>
+                <input 
+                  type="text" 
+                  name="phone" 
+                  value={newAddress.phone} 
+                  onChange={handleChange} 
+                  placeholder={t('addresses.phonePlaceholder')}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>{t('addresses.street')}</label>
+                <input 
+                  type="text" 
+                  name="street" 
+                  value={newAddress.street} 
+                  onChange={handleChange} 
+                  placeholder={t('addresses.streetPlaceholder')}
+                />
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>{t('addresses.city')}</label>
+                  <input 
+                    type="text" 
+                    name="city" 
+                    value={newAddress.city} 
+                    onChange={handleChange} 
+                    placeholder={t('addresses.cityPlaceholder')}
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>{t('addresses.state')}</label>
+                  <input 
+                    type="text" 
+                    name="state" 
+                    value={newAddress.state} 
+                    onChange={handleChange} 
+                    placeholder={t('addresses.statePlaceholder')}
+                  />
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>{t('addresses.zipcode')}</label>
+                  <input 
+                    type="text" 
+                    name="zipcode" 
+                    value={newAddress.zipcode} 
+                    onChange={handleChange} 
+                    placeholder={t('addresses.zipcodePlaceholder')}
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>{t('addresses.country')}</label>
+                  <input 
+                    type="text" 
+                    name="country" 
+                    value={newAddress.country} 
+                    onChange={handleChange} 
+                    placeholder={t('addresses.countryPlaceholder')}
+                  />
+                </div>
+              </div>
+              
+              {/* Map Container */}
+              <div className="map-section">
+                <label>{t('addresses.selectLocation')}</label>
+                <div className="map-container" ref={mapContainer}></div>
+                
+                <div className="map-instructions">
+                  <p>{t('addresses.mapInstructions')}</p>
+                  <button 
+                    type="button" 
+                    className="location-btn" 
+                    onClick={getUserLocation}
+                    disabled={gettingLocation}
+                  >
+                    {gettingLocation ? t('addresses.locating') : t('addresses.useMyLocation')}
+                  </button>
+                </div>
+                
+                <div className="form-row coordinates-inputs">
+                  <div className="form-group">
+                    <label>{t('addresses.latitude')}</label>
+                    <input 
+                      type="text" 
+                      name="lat" 
+                      value={newAddress.coordinates.lat} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>{t('addresses.longitude')}</label>
+                    <input 
+                      type="text" 
+                      name="lng" 
+                      value={newAddress.coordinates.lng} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-group checkbox">
+                <input 
+                  type="checkbox" 
+                  id="isDefault" 
+                  name="isDefault" 
+                  checked={newAddress.isDefault} 
+                  onChange={(e) => setNewAddress({...newAddress, isDefault: e.target.checked})} 
+                />
+                <label htmlFor="isDefault">{t('addresses.makeDefault')}</label>
+              </div>
+              
+              <div className="form-actions">
+                <button type="button" className="cancel-btn" onClick={resetForm}>
+                  {t('common.cancel')}
+                </button>
+                <button type="button" className="save-btn" onClick={addAddress}>
+                  {t('common.save')}
+                </button>
+              </div>
             </div>
           </div>
         </div>

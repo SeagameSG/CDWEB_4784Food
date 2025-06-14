@@ -1,0 +1,128 @@
+
+.reviews-table-format {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 1fr 2fr 1fr 0.8fr;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.reviews {
+    margin-bottom: 50px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Table Header */
+.reviews-table-format.title {
+    background: linear-gradient(135deg, #00796B, #004D40);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 8px 8px 0 0;
+    font-size: 15px;
+}
+
+/* Table Row Hover Effect */
+.reviews-table-format:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.reviews-header p {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer-email {
+    font-size: 12px;
+    color: #666;
+}
+
+.rating-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stars {
+    color: gold;
+    font-size: 16px;
+}
+
+.rating-number {
+    font-size: 12px;
+    color: #666;
+}
+
+.comment {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.date {
+    font-size: 12px;
+    color: #666;
+}
+
+.delete-btn {
+    background-color: #DC3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+    .reviews-table-format {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .reviews-table-format.title {
+        display: none;
+    }
+
+    .reviews-table-format > * {
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .comment {
+        max-width: none;
+        white-space: normal;
+    }
+}

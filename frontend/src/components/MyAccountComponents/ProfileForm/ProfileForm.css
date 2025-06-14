@@ -1,10 +1,9 @@
 .profile-form {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Tabs Navigation */
@@ -42,7 +41,7 @@
   border-top-right-radius: 3px;
 }
 
-/* Profile content layout */
+/* Rest of CSS remains the same */
 .profile-content {
   display: flex;
   align-items: flex-start;
@@ -168,6 +167,23 @@
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+.secondary-btn{
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.secondary-btn:hover {
+  background: linear-gradient(135deg, #e0e0e0, #d0d0d0);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Password Reset Section */

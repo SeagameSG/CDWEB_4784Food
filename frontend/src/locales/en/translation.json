@@ -46,7 +46,21 @@
     "loading": "Loading..."
   },
   "customerReview": {
-    "title": "Customer Reviews:"
+    "title": "Customer Reviews:",
+    "searchPlaceholder": "Search by food name...",
+    "addReview": "Add Review",
+    "selectFood": "Select a food item",
+    "customerName": "Your Name",
+    "customerEmail": "Your Email",
+    "rating": "Rating",
+    "star": "star",
+    "stars": "stars",
+    "comment": "Your Review",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "cancel": "Cancel",
+    "reviewAdded": "Review added successfully!",
+    "addError": "Error adding review"
   },
   "aboutUs": {
     "title": "About Us",
@@ -139,6 +153,13 @@
     "paymentStatusLabel": "Payment Status"
   },
   "placeOrder": {
+    "title": "Place Order",
+    "selectAddress": "Select Delivery Address",
+    "noAddresses": "You don't have any saved addresses",
+    "addNewAddress": "Add New Address",
+    "cashOnDelivery": "Cash on Delivery",
+    "orderSummary": "Order Summary",
+    "placeOrderButton": "Place Order",
     "shippingInfo": "Shipping Information",
     "savedAddresses": "Saved Addresses",
     "defaultBadge": "Default",
@@ -186,7 +207,8 @@
   "profileForm": {
     "tabs": {
       "profile": "Profile",
-      "password": "Change password"
+      "password": "Change password",
+      "resetPassword": "Reset Password"
     },
     "fullName": "FullName",
     "email": "Email",
@@ -209,50 +231,101 @@
       "profileUpdated": "Update Completed"
     }
   },
-  "myAddress": {
-    "title": "Manage Address",
-    "addNewAddress": "Add New Address",
-    "loading": "Loading...",
-    "noAddress": "You don't have any addresses. Please add a new address.",
-    "default": "Default",
-    "makeDefault": "Set as Default",
+  "addresses": {
+    "title": "My Addresses",
+    "addNew": "Add New Address",
+    "noAddresses": "You don't have any saved addresses yet.",
     "edit": "Edit",
-    "delete": "Delete",
+    "remove": "Remove",
+    "setDefault": "Set as Default",
+    "default": "Default",
+    "coordinates": "Coordinates",
     "editAddress": "Edit Address",
     "addAddress": "Add New Address",
-    "fullName": "Full Name",
-    "phone": "Phone",
-    "street": "Street",
+    "name": "Full Name",
+    "namePlaceholder": "Enter your full name",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "street": "Street Address",
+    "streetPlaceholder": "Enter your street address",
     "city": "City",
-    "state": "State",
-    "zipCode": "Zip Code",
+    "cityPlaceholder": "Enter your city",
+    "state": "State/Province",
+    "statePlaceholder": "Enter your state or province",
+    "zipcode": "Postal Code",
+    "zipcodePlaceholder": "Enter your postal code",
     "country": "Country",
-    "coordinates": "Coordinates:",
-    "getCurrentLocation": "Get Current Location",
-    "gettingLocation": "Getting location...",
-    "save": "Save",
-    "cancel": "Cancel"
+    "countryPlaceholder": "Enter your country",
+    "makeDefault": "Make this my default address",
+    "selectLocation": "Select Location on Map",
+    "mapInstructions": "Move the map to position the marker at your exact location",
+    "useMyLocation": "Use My Current Location",
+    "locating": "Getting location...",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "confirmDelete": "Are you sure you want to delete this address?",
+    "fetchError": "Failed to fetch addresses",
+    "addSuccess": "Address added successfully",
+    "addError": "Failed to add address",
+    "updateSuccess": "Address updated successfully",
+    "updateError": "Failed to update address",
+    "deleteSuccess": "Address deleted successfully",
+    "deleteError": "Failed to delete address",
+    "defaultSuccess": "Default address updated",
+    "defaultError": "Failed to update default address",
+    "locationError": "Could not get your location",
+    "browserNotSupported": "Your browser doesn't support geolocation",
+    "saveError": "Error saving address"
   },
+
   "resetPassword": {
     "title": "Reset Password",
-    "currentPassword": "Current Password",
     "verifyEmail": "Verify Email",
+    "sendOtp": "Send OTP",
+    "enterOtp": "Enter OTP",
+    "otpSentTo": "OTP has been sent to",
+    "otp": "One-Time Password (OTP)",
+    "otpPlaceholder": "Enter 6-digit OTP",
+    "verifyOtp": "Verify OTP",
+    "setNewPassword": "Set New Password",
     "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
     "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
     "resetButton": "Reset Password",
+    "otpSent": "OTP has been sent to your email",
+    "otpVerified": "OTP verified successfully",
     "passwordStrength": {
       "weak": "Weak",
       "good": "Good",
       "strong": "Strong"
     },
     "errors": {
+      "emailRequired": "Email is required",
+      "otpRequired": "OTP is required",
       "passwordsDoNotMatch": "Passwords do not match!",
       "passwordTooShort": "Password must be at least 8 characters",
-      "resetFailed": "Password change failed",
-      "currentPasswordIncorrect": "Current Password Incorrect"
+      "resetFailed": "Password reset failed",
+      "currentPasswordIncorrect": "Current Password Incorrect",
+      "otpSendFailed": "Failed to send OTP",
+      "invalidOtp": "Invalid or expired OTP",
+      "verificationFailed": "OTP verification failed"
     },
     "success": "Password reset successfully!"
   },
+  "changePassword": {
+    "title": "Change Password",
+    "sendOtp": "Send OTP to Email",
+    "otpInfo": "We'll send a verification code to your registered email address for security purposes.",
+    "otp": "Verification Code (OTP)",
+    "otpPlaceholder": "Enter 6-digit code",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "changeButton": "Change Password"
+  },
+
   "loginPopup": {
     "login": "Login",
     "signUp": "Sign Up",
@@ -267,5 +340,11 @@
     "clickHere": "Click here",
     "haveAccount": "Already have an account ? ",
     "loginHere": "Login here"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back"
   }
 }

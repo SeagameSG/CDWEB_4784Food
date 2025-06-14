@@ -146,31 +146,58 @@
   z-index: 1000;
 }
 
-.address-form {
+.address-modal-content {
   background-color: white;
-  padding: 30px;
-  border-radius: 10px;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.address-form h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #2E8B57;
-  font-size: 20px;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
 }
 
-.address-form input, 
-.address-form textarea {
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.address-form {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input {
   width: 100%;
   padding: 10px;
-  margin-bottom: 15px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .form-row {
@@ -178,73 +205,38 @@
   gap: 15px;
 }
 
-.form-row input {
+.form-row .form-group {
   flex: 1;
 }
 
-.location-section {
-  margin: 15px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.coordinates-display {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.get-location-btn {
-  background-color: #2E8B57;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.get-location-btn:hover {
-  background-color: #1d6a44;
-}
-
-.default-checkbox {
+.form-group.checkbox {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 15px 0;
 }
 
-.default-checkbox input {
+.form-group.checkbox input {
   width: auto;
-  margin: 0;
 }
 
-.address-form-actions {
+.form-group.checkbox label {
+  margin-bottom: 0;
+}
+
+.form-actions {
   display: flex;
-  gap: 15px;
+  justify-content: flex-end;
+  gap: 10px;
   margin-top: 20px;
 }
 
-.save-btn, .cancel-btn {
+.cancel-btn, .save-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   transition: all 0.3s ease;
-}
-
-.save-btn {
-  background-color: #2E8B57;
-  color: white;
-  flex: 1;
-}
-
-.save-btn:hover {
-  background-color: #1d6a44;
 }
 
 .cancel-btn {
@@ -256,26 +248,81 @@
   background-color: #e0e0e0;
 }
 
-.loading-text {
-  text-align: center;
-  padding: 20px;
-  color: #777;
+.save-btn {
+  background-color: #2E8B57;
+  color: white;
 }
 
-.no-address {
-  text-align: center;
-  padding: 30px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  color: #555;
+.save-btn:hover {
+  background-color: #1d6a44;
 }
 
-.address-form input:invalid {
-  border: 2px solid #ff5252;
-  background-color: rgba(255, 82, 82, 0.05);
+/* Map related styles */
+.map-section {
+  margin: 20px 0;
 }
 
-.address-form input:focus:invalid {
-  box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.25);
-  outline: none;
+.map-container {
+  width: 100%;
+  height: 250px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+}
+
+.map-instructions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.map-instructions p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.location-btn {
+  background-color: #2E8B57;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.location-btn:hover {
+  background-color: #1d6a44;
+}
+
+.location-btn:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.coordinates-inputs {
+  margin-top: 10px;
+}
+
+.crosshair-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-crosshair {
+  color: #2E8B57;
+  font-size: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
 }
