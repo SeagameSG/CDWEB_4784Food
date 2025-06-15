@@ -5,6 +5,8 @@ import { assets } from '../../assets/assets';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSearchParams } from 'react-router-dom';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 const TrackOrder = ({ url }) => {
   const [data, setData] = useState([]);
@@ -12,18 +14,23 @@ const TrackOrder = ({ url }) => {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
   const [selectedOrderId, setSelectedOrderId] = useState(orderId || null);
-  const mapInstanceRef = useRef(null);
+  const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
   
   const [deliveryTimes, setDeliveryTimes] = useState({});
 
+  // API Keys from environment variables
+  const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
+  const OPENROUTESERVICE_KEY = import.meta.env.VITE_OPENROUTESERVICE_KEY;
+
   // Default coordinates 4784Food
-  const STORE_COORDINATES = { lat: 10.8499, lng: 106.8118 };
+  const STORE_COORDINATES = { lat: 10.883700, lng: 106.784002 };
   
   const DEFAULT_COORDINATES = { lat: 10.8231, lng: 106.6297 };
 
-  // Haversine
+  // Haversine formula to calculate distance between two coordinates
   const calculateDistance = (coords1, coords2) => {
-    const R = 6371;
+    const R = 6371; // Earth's radius in km
     const dLat = (coords2.lat - coords1.lat) * Math.PI / 180;
     const dLon = (coords2.lng - coords1.lng) * Math.PI / 180;
     const a = 
@@ -35,6 +42,7 @@ const TrackOrder = ({ url }) => {
     return distance;
   };
 
+  // Calculate estimated delivery time based on distance
   const calculateDeliveryTime = (orderCoordinates) => {
     if (!validateCoordinates(orderCoordinates)) {
       return {
@@ -45,7 +53,9 @@ const TrackOrder = ({ url }) => {
 
     const distance = calculateDistance(STORE_COORDINATES, orderCoordinates);
 
+    // Assume average speed of 0.5 km/minute (30 km/h)
     const travelTime = distance / 0.5;
+    // Add 20 minutes for food preparation
     const totalMinutes = Math.ceil(20 + travelTime);
 
     let formattedTime;
@@ -65,6 +75,7 @@ const TrackOrder = ({ url }) => {
     return { minutes: totalMinutes, formatted: formattedTime };
   };
 
+  // Validate coordinates to ensure they are valid
   const validateCoordinates = (coords) => {
     if (!coords) return false;
     if (typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return false;
@@ -74,6 +85,32 @@ const TrackOrder = ({ url }) => {
     return true;
   };
 
+  // Fetch route data from OpenRouteService
+  const fetchRoute = async (start, end) => {
+    try {
+      const response = await axios.post(
+        'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+        {
+          coordinates: [[start.lng, start.lat], [end.lng, end.lat]],
+          format: 'geojson'
+        },
+        {
+          headers: {
+            'Authorization': OPENROUTESERVICE_KEY,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching route:', error);
+      // Return null if routing fails, we'll fall back to straight line
+      return null;
+    }
+  };
+
+  // Fetch all orders from API (admin gets all orders)
   const fetchOrders = async () => {
     try {
       const response = await axios.get(url + "/api/order/list");
@@ -81,12 +118,14 @@ const TrackOrder = ({ url }) => {
         const ordersData = response.data.data;
         setData(ordersData);
 
+        // Calculate delivery time for each order
         const times = {};
         ordersData.forEach(order => {
           times[order._id] = calculateDeliveryTime(order.coordinates);
         });
         setDeliveryTimes(times);
 
+        // Set selected order ID
         if (orderId) {
           setSelectedOrderId(orderId);
         } 
@@ -106,17 +145,19 @@ const TrackOrder = ({ url }) => {
     }
   };
 
-  // Initialize Leaflet map
-  const initializeMap = (order) => {
-    if (!order || !window.L) return;
+  // Initialize MapLibre map with MapTiler
+  const initializeMap = async (order) => {
+    if (!order) return;
 
     setSelectedOrderId(order._id);
 
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.remove();
-      mapInstanceRef.current = null;
+    // Clean up existing map if any
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
     }
 
+    // Set coordinates, use default if invalid
     let coordinates = DEFAULT_COORDINATES;
     if (validateCoordinates(order.coordinates)) {
       coordinates = order.coordinates;
@@ -125,83 +166,141 @@ const TrackOrder = ({ url }) => {
     }
 
     try {
-      const bounds = [
-        [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
-        [coordinates.lat, coordinates.lng]
-      ];
-
-      const map = window.L.map('map-container', {
+      // Create new MapLibre map
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
         center: [
-          (STORE_COORDINATES.lat + coordinates.lat) / 2,
-          (STORE_COORDINATES.lng + coordinates.lng) / 2
+          (STORE_COORDINATES.lng + coordinates.lng) / 2,
+          (STORE_COORDINATES.lat + coordinates.lat) / 2
         ],
         zoom: 12
       });
 
-      map.fitBounds(bounds, { padding: [50, 50] });
+      // Store map reference for cleanup
+      mapRef.current = map;
 
-      mapInstanceRef.current = map;
+      // Add navigation controls
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+      // Wait for map to load before adding markers and route
+      map.on('load', async () => {
+        // Fit map to show both store and delivery locations
+        const bounds = new maplibregl.LngLatBounds()
+          .extend([STORE_COORDINATES.lng, STORE_COORDINATES.lat])
+          .extend([coordinates.lng, coordinates.lat]);
+        
+        map.fitBounds(bounds, { padding: 100 });
 
-      try {
-        window.L.maplibreGL({
-          style: 'https://tiles.openfreemap.org/styles/liberty',
-          attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-      } catch (mapLibreError) {
-        console.warn("Error loading MapLibre GL layer:", mapLibreError);
-      }
+        // Add store marker
+        const storeEl = document.createElement('div');
+        storeEl.className = 'store-marker';
+        storeEl.innerHTML = '<i class="fas fa-store"></i>';
 
-      const storeIcon = window.L.divIcon({
-        html: `<div class="store-marker"><i class="fas fa-store"></i></div>`,
-        className: 'store-icon',
-        iconSize: [30, 30]
+        new maplibregl.Marker(storeEl)
+          .setLngLat([STORE_COORDINATES.lng, STORE_COORDINATES.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="map-popup store-popup">
+                  <h3>4784Food Store</h3>
+                  <p>Main restaurant location</p>
+                </div>
+              `)
+          )
+          .addTo(map);
+
+        // Add delivery location marker
+        const deliveryEl = document.createElement('div');
+        deliveryEl.className = 'delivery-marker';
+        deliveryEl.innerHTML = '<i class="fas fa-map-marker"></i>';
+
+        new maplibregl.Marker(deliveryEl)
+          .setLngLat([coordinates.lng, coordinates.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="map-popup">
+                  <h3>Delivery Address</h3>
+                  <p>${order.address.street || ''}, ${order.address.city || ''}</p>
+                  <p>${order.address.state || ''}, ${order.address.country || ''}</p>
+                  <p><strong>Status:</strong> ${order.status || 'Processing'}</p>
+                  <p><strong>Estimated Delivery Time:</strong> ${deliveryTimes[order._id]?.formatted || 'About 45 minutes'}</p>
+                </div>
+              `)
+          )
+          .addTo(map);
+
+        // Fetch and add route from OpenRouteService
+        try {
+          const routeData = await fetchRoute(STORE_COORDINATES, coordinates);
+          
+          if (routeData && routeData.features && routeData.features.length > 0) {
+            // Add the actual route from OpenRouteService
+            map.addSource('route', {
+              'type': 'geojson',
+              'data': routeData
+            });
+
+            map.addLayer({
+              'id': 'route',
+              'type': 'line',
+              'source': 'route',
+              'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              'paint': {
+                'line-color': '#FF5733',
+                'line-width': 4,
+                'line-opacity': 0.8
+              }
+            });
+
+            // Fit map to show the entire route
+            const routeBounds = new maplibregl.LngLatBounds();
+            routeData.features[0].geometry.coordinates.forEach(coord => {
+              routeBounds.extend(coord);
+            });
+            map.fitBounds(routeBounds, { padding: 50 });
+          } else {
+            // Fallback to straight line if routing fails
+            console.warn('Route data not available, using straight line');
+            map.addSource('route', {
+              'type': 'geojson',
+              'data': {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                  'type': 'LineString',
+                  'coordinates': [
+                    [STORE_COORDINATES.lng, STORE_COORDINATES.lat],
+                    [coordinates.lng, coordinates.lat]
+                  ]
+                }
+              }
+            });
+
+            map.addLayer({
+              'id': 'route',
+              'type': 'line',
+              'source': 'route',
+              'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              'paint': {
+                'line-color': '#FF5733',
+                'line-width': 3,
+                'line-opacity': 0.7,
+                'line-dasharray': [2, 2]
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error adding route to map:', error);
+        }
       });
-
-      window.L.marker([STORE_COORDINATES.lat, STORE_COORDINATES.lng], {
-        icon: storeIcon
-      })
-        .addTo(map)
-        .bindPopup(`
-          <div class="map-popup store-popup">
-            <h3>4784Food Store</h3>
-            <p>Main restaurant location</p>
-          </div>
-        `);
-
-      const deliveryIcon = window.L.divIcon({
-        html: `<div class="delivery-marker"><i class="fas fa-map-marker"></i></div>`,
-        className: 'delivery-icon',
-        iconSize: [30, 30]
-      });
-
-      window.L.marker([coordinates.lat, coordinates.lng], {
-        icon: deliveryIcon
-      })
-        .addTo(map)
-        .bindPopup(`
-          <div class="map-popup">
-            <h3>Delivery Address</h3>
-            <p>${order.address.street || ''}, ${order.address.city || ''}</p>
-            <p>${order.address.state || ''}, ${order.address.country || ''}</p>
-            <p><strong>Status:</strong> ${order.status || 'Processing'}</p>
-            <p><strong>Estimated Delivery Time:</strong> ${deliveryTimes[order._id]?.formatted || 'About 45 minutes'}</p>
-          </div>
-        `)
-        .openPopup();
-
-      window.L.polyline([
-        [STORE_COORDINATES.lat, STORE_COORDINATES.lng],
-        [coordinates.lat, coordinates.lng]
-      ], {
-        color: '#FF5733',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '10, 10'
-      }).addTo(map);
 
       return map;
     } catch (error) {
@@ -210,114 +309,66 @@ const TrackOrder = ({ url }) => {
     }
   };
 
+  // Load FontAwesome for map icons
   useEffect(() => {
-    let scriptLoadTimer = null;
-
-    // Font Awesome map icons
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
-
-    if (!document.querySelector('script[src*="leaflet"]')) {
-      const leafletCss = document.createElement('link');
-      leafletCss.rel = 'stylesheet';
-      leafletCss.href = 'https://unpkg.com/leaflet/dist/leaflet.css';
-      document.head.appendChild(leafletCss);
-
-      const leafletScript = document.createElement('script');
-      leafletScript.src = 'https://unpkg.com/leaflet/dist/leaflet.js';
-      document.body.appendChild(leafletScript);
-
-      scriptLoadTimer = setTimeout(() => {
-        if (!window.L) {
-          console.warn("Map scripts failed to load in a timely manner");
-          setLoading(false);
-        }
-      }, 10000); // 10 second timeout
-
-      leafletScript.onload = () => {
-        clearTimeout(scriptLoadTimer);
-
-        try {
-          const maplibreScript = document.createElement('script');
-          maplibreScript.src = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.js';
-          document.body.appendChild(maplibreScript);
-
-          maplibreScript.onload = () => {
-            const maplibreCss = document.createElement('link');
-            maplibreCss.rel = 'stylesheet';
-            maplibreCss.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css';
-            document.head.appendChild(maplibreCss);
-
-            const maplibreLeafletScript = document.createElement('script');
-            maplibreLeafletScript.src = 'https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js';
-            document.body.appendChild(maplibreLeafletScript);
-          };
-        } catch (error) {
-          console.warn("Error loading MapLibre scripts:", error);
-        }
-
-        if (data.length > 0) {
-          const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
-          initializeMap(orderToDisplay);
-        }
-      };
-    } else {
-      // Initialize map have data
-      if (data.length > 0 && window.L) {
-        const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
-        initializeMap(orderToDisplay);
-      }
+    // Add Font Awesome for map icons if not already loaded
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const fontAwesome = document.createElement('link');
+      fontAwesome.rel = 'stylesheet';
+      fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+      document.head.appendChild(fontAwesome);
     }
+  }, []);
 
-    return () => {
-      // Clean up map instance on component unmount
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      // Clear timeout if component unmounts
-      if (scriptLoadTimer) {
-        clearTimeout(scriptLoadTimer);
-      }
-    };
-  }, []); // Only run once on mount
-
-  // Update map when data or selectedOrderId changes
+  // Initialize map when data is loaded
   useEffect(() => {
-    if (data.length > 0 && window.L) {
+    if (data.length > 0) {
       const orderToDisplay = data.find(order => order._id === selectedOrderId) || data[0];
-      if (orderToDisplay) {
-        initializeMap(orderToDisplay);
-      }
+      initializeMap(orderToDisplay);
     }
   }, [data, selectedOrderId]);
 
+  // Clean up map on component unmount
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Fetch orders when component mounts
   useEffect(() => {
     fetchOrders();
 
+    // Set up interval to refresh order status periodically
     const intervalId = setInterval(() => {
       fetchOrders();
-    }, 30000); // Check every 30 seconds
+    }, 180000); // Check every 3 minutes
 
     return () => {
       clearInterval(intervalId); // Cleanup on unmount
     };
   }, []);
 
+  // Handle case when selected order is not found
+  const orderToDisplay = data.find(order => order._id === selectedOrderId);
+  if (!orderToDisplay && data.length > 0) {
+    setSelectedOrderId(data[0]._id);
+  }
+
   return (
-    <div className="track-order add">
+    <div className="track-order">
       <ToastContainer />
-      <h3>Track Orders</h3>
+      <h3>Track Orders (Admin)</h3>
 
       {loading ? (
-        <div className="loading-spinner">Loading order data...</div>
+        <div className="loading-spinner">Loading orders...</div>
       ) : (
         <div className="track-order-container">
           {/* Map container */}
-          <div id="map-container" className="map-container"></div>
+          <div id="map-container" className="map-container" ref={mapContainerRef}></div>
 
           {/* Orders list */}
           <div className="orders-list">
@@ -328,32 +379,51 @@ const TrackOrder = ({ url }) => {
                   className={`order-item ${selectedOrderId === order._id ? 'order-item-selected' : ''}`}
                   onClick={() => initializeMap(order)}
                 >
-                  <img src={assets.parcel_icon} alt="Parcel Icon" />
                   <div className="order-details">
-                    <p className="order-items">
-                      {order.items.map((item, idx) =>
-                        `${item.name} x ${item.quantity}${idx < order.items.length - 1 ? ', ' : ''}`
-                      )}
-                    </p>
-                    <p className="order-item-name">{order.address.firstname + " " + order.address.lastname}</p>
-                    <div className="order-item-address">
-                      <p>{order.address.street}</p>
-                      <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.zipcode}</p>
+                    <div className="order-detail-info">
+                      <img src={assets.parcel_icon} alt="" />
+
+                      <div className="order-detail-info-item">
+                        <p className="order-items">
+                          {order.items.map((item, idx) =>
+                              `${item.name} x ${item.quantity}${idx < order.items.length - 1 ? ', ' : ''}`
+                          )}
+                        </p>
+                        <p className="order-price">₫{order.amount}.00</p>
+                      </div>
+
+                      <div className="order-detail-info-status">
+                        <p className="order-count">Items: {order.items.length}</p>
+                        <div className="order-status">
+                          <span className="status-dot">&#x25cf; </span>
+                          <b>{order.status}</b>
+                        </div>
+                      </div>
                     </div>
-                    <p className="order-price">₫{order.amount}.00</p>
-                    <p className="order-count">Items: {order.items.length}</p>
-                    <div className="order-status">
-                      <span className="status-dot">&#x25cf; </span>
-                      <b>{order.status}</b>
+
+                    <div className="order-payment-info">
+                      <p><strong>Payment Method:</strong> {order.paymentMethod === 'vnpay' ? 'VNPay' : 'Cash on Delivery'}</p>
+                      <p className={`payment-status ${order.payment ? 'paid' : 'unpaid'}`}>
+                        <strong>Payment Status:</strong> {order.payment ? 'Paid' : 'Unpaid'}
+                      </p>
                     </div>
+
                     <div className="delivery-time">
                       Estimated Delivery Time: {deliveryTimes[order._id]?.formatted || 'About 45 minutes'}
+                    </div>
+
+                    <div className="order-address">
+                      <p><strong>Customer:</strong> {order.address.firstName} {order.address.lastName}</p>
+                      <p><strong>Phone:</strong> {order.address.phone}</p>
+                      <p><strong>Email:</strong> {order.address.email}</p>
+                      <p><strong>Address:</strong> {order.address.street}, {order.address.city}</p>
+                      <p>{order.address.state}, {order.address.country} {order.address.zipCode}</p>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="no-orders">No orders available</p>
+              <p className="no-orders">No orders found.</p>
             )}
           </div>
         </div>

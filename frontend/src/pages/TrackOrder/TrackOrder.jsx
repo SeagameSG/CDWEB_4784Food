@@ -24,11 +24,12 @@ const TrackOrder = () => {
   
   const [deliveryTimes, setDeliveryTimes] = useState({});
 
-  // MapTiler API key from environment variables
+  // API Keys from environment variables
   const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
+  const OPENROUTESERVICE_KEY = import.meta.env.VITE_OPENROUTESERVICE_KEY;
 
   // Default coordinates 4784Food
-  const STORE_COORDINATES = { lat: 10.8499, lng: 106.8118 };
+  const STORE_COORDINATES = { lat: 10.883700, lng: 106.784002 };
   
   const DEFAULT_COORDINATES = { lat: 10.8231, lng: 106.6297 };
 
@@ -89,6 +90,31 @@ const TrackOrder = () => {
     return true;
   };
 
+  // Fetch route data from OpenRouteService
+  const fetchRoute = async (start, end) => {
+    try {
+      const response = await axios.post(
+        'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+        {
+          coordinates: [[start.lng, start.lat], [end.lng, end.lat]],
+          format: 'geojson'
+        },
+        {
+          headers: {
+            'Authorization': OPENROUTESERVICE_KEY,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching route:', error);
+      // Return null if routing fails, we'll fall back to straight line
+      return null;
+    }
+  };
+
   // Fetch orders from API
   const fetchOrders = async () => {
     try {
@@ -132,7 +158,7 @@ const TrackOrder = () => {
   };
 
   // Initialize MapLibre map with MapTiler
-  const initializeMap = (order) => {
+  const initializeMap = async (order) => {
     if (!order) return;
 
     setSelectedOrderId(order._id);
@@ -169,8 +195,8 @@ const TrackOrder = () => {
       // Add navigation controls
       map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-      // Wait for map to load before adding markers
-      map.on('load', () => {
+      // Wait for map to load before adding markers and route
+      map.on('load', async () => {
         // Fit map to show both store and delivery locations
         const bounds = new maplibregl.LngLatBounds()
           .extend([STORE_COORDINATES.lng, STORE_COORDINATES.lat])
@@ -217,37 +243,75 @@ const TrackOrder = () => {
           )
           .addTo(map);
 
-        // Draw a line between store and delivery location
-        map.addSource('route', {
-          'type': 'geojson',
-          'data': {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'type': 'LineString',
-              'coordinates': [
-                [STORE_COORDINATES.lng, STORE_COORDINATES.lat],
-                [coordinates.lng, coordinates.lat]
-              ]
-            }
-          }
-        });
+        // Fetch and add route from OpenRouteService
+        try {
+          const routeData = await fetchRoute(STORE_COORDINATES, coordinates);
+          
+          if (routeData && routeData.features && routeData.features.length > 0) {
+            // Add the actual route from OpenRouteService
+            map.addSource('route', {
+              'type': 'geojson',
+              'data': routeData
+            });
 
-        map.addLayer({
-          'id': 'route',
-          'type': 'line',
-          'source': 'route',
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          'paint': {
-            'line-color': '#FF5733',
-            'line-width': 3,
-            'line-opacity': 0.7,
-            'line-dasharray': [2, 2]
+            map.addLayer({
+              'id': 'route',
+              'type': 'line',
+              'source': 'route',
+              'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              'paint': {
+                'line-color': '#FF5733',
+                'line-width': 4,
+                'line-opacity': 0.8
+              }
+            });
+
+            // Fit map to show the entire route
+            const routeBounds = new maplibregl.LngLatBounds();
+            routeData.features[0].geometry.coordinates.forEach(coord => {
+              routeBounds.extend(coord);
+            });
+            map.fitBounds(routeBounds, { padding: 50 });
+          } else {
+            // Fallback to straight line if routing fails
+            console.warn('Route data not available, using straight line');
+            map.addSource('route', {
+              'type': 'geojson',
+              'data': {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                  'type': 'LineString',
+                  'coordinates': [
+                    [STORE_COORDINATES.lng, STORE_COORDINATES.lat],
+                    [coordinates.lng, coordinates.lat]
+                  ]
+                }
+              }
+            });
+
+            map.addLayer({
+              'id': 'route',
+              'type': 'line',
+              'source': 'route',
+              'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+              },
+              'paint': {
+                'line-color': '#FF5733',
+                'line-width': 3,
+                'line-opacity': 0.7,
+                'line-dasharray': [2, 2]
+              }
+            });
           }
-        });
+        } catch (error) {
+          console.error('Error adding route to map:', error);
+        }
       });
 
       return map;
@@ -304,7 +368,7 @@ const TrackOrder = () => {
       if (token) {
         fetchOrders();
       }
-    }, 30000); // Check every 30 seconds
+    }, 180000); // Check every 3 minutes
 
     return () => {
       clearInterval(intervalId); // Cleanup on unmount
