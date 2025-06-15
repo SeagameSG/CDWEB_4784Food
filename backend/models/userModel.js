@@ -8,8 +8,6 @@ const userSchema = new mongoose.Schema({
     cartData:{type: Object, default:{}},
     gender:{type: String, enum: ['male', 'female', 'other'], default: 'other'},
     phone:{type: String, default: '1'},
-    resetPasswordOTP: {type: String},
-    resetPasswordExpiry: {type: Date},
     changePasswordOTP: {type: String},
     changePasswordExpiry: {type: Date}
 },{minimize:false})
