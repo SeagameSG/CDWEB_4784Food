@@ -95,7 +95,7 @@ const createVnpayPaymentUrl = async (req, res) => {
         // Create date format for VNPAY
         const date = new Date();
         const createDate = moment(date).format('YYYYMMDDHHmmss');
-        const orderId = dateFormat(date, 'HHmmss');
+        const orderId = dateFormat(date, 'YYYYMMDDHHmmss');
 
         // Create VNPAY parameters
         let vnpParams = {};
